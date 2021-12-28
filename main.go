@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Message struct {
@@ -25,9 +27,12 @@ func sayHelloWorldFrench(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/french", sayHelloWorldFrench)
-	log.Fatal(http.ListenAndServe(":10000", nil))
+	myRouter := mux.NewRouter().StrictSlash(true)
+
+	myRouter.HandleFunc("/", homePage)
+	myRouter.HandleFunc("/french", sayHelloWorldFrench)
+
+	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
 func main() {
