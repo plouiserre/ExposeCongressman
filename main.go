@@ -9,8 +9,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Message struct {
-	Greeting string `json:"Greeting"`
+type Greeting struct {
+	Language string `json:"Langage"`
+	Message  string `json:"Greeting"`
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -19,18 +20,19 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func sayHelloWorldFrench(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: french Page")
-	hiFrench := Message{
-		Greeting: "Salut tout le monde!!!",
+	fmt.Println("Endpoint Hit: greetings Page")
+	Greetings := []Greeting{
+		{Language: "French", Message: "Salut tout le monde!!!"},
+		{Language: "Hello", Message: "Hello every body!!!!"},
 	}
-	json.NewEncoder(w).Encode(hiFrench)
+	json.NewEncoder(w).Encode(Greetings)
 }
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/french", sayHelloWorldFrench)
+	myRouter.HandleFunc("/greetings", sayHelloWorldFrench)
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
