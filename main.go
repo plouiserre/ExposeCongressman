@@ -9,6 +9,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var Greetings = []Greeting{
+	{Language: "French", Message: "Salut tout le monde!!!"},
+	{Language: "English", Message: "Hello every body!!!!"},
+}
+
 type Greeting struct {
 	Language string `json:"Langage"`
 	Message  string `json:"Greeting"`
@@ -19,20 +24,29 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: homepage")
 }
 
-func sayHelloWorldFrench(w http.ResponseWriter, r *http.Request) {
+func sayGreetings(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: greetings Page")
-	Greetings := []Greeting{
-		{Language: "French", Message: "Salut tout le monde!!!"},
-		{Language: "Hello", Message: "Hello every body!!!!"},
-	}
+
 	json.NewEncoder(w).Encode(Greetings)
+}
+
+func greetingSpecificLanguage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	key := vars["Language"]
+
+	for _, greeting := range Greetings {
+		if greeting.Language == key {
+			json.NewEncoder(w).Encode(greeting)
+		}
+	}
 }
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/greetings", sayHelloWorldFrench)
+	myRouter.HandleFunc("/greetings", sayGreetings)
+	myRouter.HandleFunc("/greeting/{Language}", greetingSpecificLanguage)
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
