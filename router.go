@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/plouiserre/exposecongressman/controllers"
+	controllers "github.com/plouiserre/exposecongressman/Controllers"
 )
 
 func InitializeRouter() *mux.Router {

@@ -1,4 +1,4 @@
-package controllers
+package Controllers
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/plouiserre/exposecongressman/models"
+	models "github.com/plouiserre/exposecongressman/Models"
 )
 
 func CongressMans(w http.ResponseWriter, r *http.Request) {
@@ -32,13 +32,7 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	congressmans := models.AllCongressMans()
-	var result models.CongressMan
-	for _, congressman := range *congressmans {
-		if congressman.Id == id {
-			result = congressman
-		}
-	}
+	congressman := models.GetCongressMan(id)
 
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(congressman)
 }
