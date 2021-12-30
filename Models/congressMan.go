@@ -9,7 +9,7 @@ import (
 )
 
 type CongressMan struct {
-	Id              int    `json:"Id"`
+	Id              int64  `json:"Id"`
 	Uid             string `json:"Uid"`
 	Civility        string `json:"Civility"`
 	FirstName       string `json:"FirstName"`
@@ -102,4 +102,37 @@ func GetCongressMan(id int) *CongressMan {
 	row.Close()
 
 	return &congressman
+}
+
+//TODO voir si on met un type de retour
+func InsertCongressMan(congressman *CongressMan) int64 {
+	db := InitDB()
+	var lid int64
+
+	if congressman == nil {
+		fmt.Println("No Data send to insert")
+	} else {
+		queryCongressMan := "INSERT INTO PROCESSDEPUTES.Congressman(CongressManUid, Civility, FirstName, LastName, Alpha, Trigramme, BirthDate, BirthCity, BirthDepartment, BirthCountry, JobTitle, CatSocPro, FamSocPro) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+		stmt, errPrepare := db.Prepare(queryCongressMan)
+		if errPrepare != nil {
+			fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+		} else {
+			res, errExec := stmt.Exec(congressman.Uid, congressman.Civility, congressman.FirstName,
+				congressman.LastName, congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
+				congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
+				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
+			if errExec != nil {
+				fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			} else {
+				var errGetLastId error
+				lid, errGetLastId = res.LastInsertId()
+				if errGetLastId != nil {
+					fmt.Println("Erreur lors de la récupération de l'id enregistré " + errGetLastId.Error())
+				}
+			}
+		}
+	}
+	defer db.Close()
+	
+	return lid
 }

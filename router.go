@@ -8,7 +8,9 @@ import (
 func InitializeRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.Methods("GET").Path("/congressmans").Name("Cars").HandlerFunc(controllers.CongressMans)
-	router.Methods("GET").Path("/congressman/{id}").Name("Car").HandlerFunc(controllers.CongressMan)
+	router.HandleFunc("/congressmans/", controllers.CongressMans).Methods("GET")
+	router.HandleFunc("/congressmans/", controllers.CreateCongressMan).Methods("POST")
+	router.HandleFunc("/congressman/{id}", controllers.CongressMan).Methods("GET")
+
 	return router
 }
