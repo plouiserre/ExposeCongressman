@@ -158,3 +158,19 @@ func UpdateCongressMan(congressman *CongressMan) {
 	}
 	defer db.Close()
 }
+
+func DeleteCongressMan(id int) {
+	db := InitDB()
+
+	queryCongressMan := "DELETE FROM PROCESSDEPUTES.Congressman WHERE CongressManId = ?"
+	stmt, errPrepare := db.Prepare(queryCongressMan)
+	if errPrepare != nil {
+		fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+	} else {
+		_, errExec := stmt.Exec(id)
+		if errExec != nil {
+			fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+		}
+	}
+	defer db.Close()
+}

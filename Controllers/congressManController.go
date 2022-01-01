@@ -94,3 +94,20 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(congressman)
 }
+
+func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
+	//TODO implement error 404 if no existing congressman with this ID
+	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+
+	vars := mux.Vars(r)
+
+	// strconv.Atoi is shorthand for ParseInt
+	id, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	models.DeleteCongressMan(id)
+}
