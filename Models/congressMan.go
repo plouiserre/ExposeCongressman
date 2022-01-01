@@ -104,7 +104,6 @@ func GetCongressMan(id int) *CongressMan {
 	return &congressman
 }
 
-//TODO voir si on met un type de retour
 func InsertCongressMan(congressman *CongressMan) int64 {
 	db := InitDB()
 	var lid int64
@@ -133,6 +132,29 @@ func InsertCongressMan(congressman *CongressMan) int64 {
 		}
 	}
 	defer db.Close()
-	
+
 	return lid
+}
+
+func UpdateCongressMan(congressman *CongressMan) {
+	db := InitDB()
+
+	if congressman == nil {
+		fmt.Println("No Data send to Update")
+	} else {
+		queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=?"
+		stmt, errPrepare := db.Prepare(queryCongressMan)
+		if errPrepare != nil {
+			fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+		} else {
+			_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
+				congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
+				congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
+				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
+			if errExec != nil {
+				fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			}
+		}
+	}
+	defer db.Close()
 }

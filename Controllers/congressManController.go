@@ -11,6 +11,7 @@ import (
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
+//TODO factoriser les parties communes entre chaque méthode
 func CongressMans(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -61,4 +62,35 @@ func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
 	lid := models.InsertCongressMan(&congressMan)
 	congressMan.Id = lid
 	json.NewEncoder(w).Encode(congressMan)
+}
+
+func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
+	//TODO implement error 404 if no existing congressman with this ID
+	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+
+	//TODO implement error 400
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body, errBody := ioutil.ReadAll(r.Body)
+	//TODO implemnter error 400
+	if errBody != nil {
+		log.Fatal(errBody)
+	}
+
+	congressman := models.GetCongressMan(id)
+	errJson := json.Unmarshal(body, &congressman)
+	//TODO implemnter error 400
+	if errBody != nil {
+		log.Fatal(errJson)
+	}
+
+	models.UpdateCongressMan(congressman)
+
+	json.NewEncoder(w).Encode(congressman)
 }
