@@ -42,7 +42,7 @@ func InitDB() (db *sql.DB) {
 	return db
 }
 
-func AllCongressMans() *CongressMans {
+func AllCongressMans() *CongressMans {  
 	var congressMans CongressMans
 	db := InitDB()
 
@@ -100,8 +100,11 @@ func GetCongressMan(id int) *CongressMan {
 
 	}
 	row.Close()
-
-	return &congressman
+	if congressman != (CongressMan{}) {
+		return &congressman
+	} else {
+		return nil
+	}
 }
 
 func InsertCongressMan(congressman *CongressMan) int64 {
@@ -136,13 +139,13 @@ func InsertCongressMan(congressman *CongressMan) int64 {
 	return lid
 }
 
-func UpdateCongressMan(congressman *CongressMan) {
+func UpdateCongressMan(congressman *CongressMan, id int) {
 	db := InitDB()
 
 	if congressman == nil {
 		fmt.Println("No Data send to Update")
 	} else {
-		queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=?"
+		queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=? WHERE CongressManId = ?"
 		stmt, errPrepare := db.Prepare(queryCongressMan)
 		if errPrepare != nil {
 			fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
@@ -150,7 +153,7 @@ func UpdateCongressMan(congressman *CongressMan) {
 			_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
 				congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
 				congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
-				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
+				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro, id)
 			if errExec != nil {
 				fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
 			}
@@ -159,7 +162,8 @@ func UpdateCongressMan(congressman *CongressMan) {
 	defer db.Close()
 }
 
-func DeleteCongressMan(id int) {
+func DeleteCongressMan(id int) int64 {
+	var nbDelete int64
 	db := InitDB()
 
 	queryCongressMan := "DELETE FROM PROCESSDEPUTES.Congressman WHERE CongressManId = ?"
@@ -167,10 +171,13 @@ func DeleteCongressMan(id int) {
 	if errPrepare != nil {
 		fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
 	} else {
-		_, errExec := stmt.Exec(id)
+		result, errExec := stmt.Exec(id)
 		if errExec != nil {
 			fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
 		}
+		nbDelete, _ = result.RowsAffected()
 	}
 	defer db.Close()
+
+	return nbDelete
 }

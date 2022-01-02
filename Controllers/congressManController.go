@@ -2,8 +2,8 @@ package Controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -11,7 +11,6 @@ import (
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
-//TODO factoriser les parties communes entre chaque méthode
 func CongressMans(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -21,93 +20,101 @@ func CongressMans(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressMan(w http.ResponseWriter, r *http.Request) {
-	//TODO implement error 404 if no existing congressman with this ID
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 
-	//TODO implement error 400
 	if err != nil {
-		log.Fatal(err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error cast " + err.Error())
+	} else {
+		congressman := models.GetCongressMan(id)
+
+		if congressman != nil {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(congressman)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
 	}
-
-	congressman := models.GetCongressMan(id)
-
-	json.NewEncoder(w).Encode(congressman)
 }
 
 func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
-	//TODO factoriser cette partie
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-
 	body, err := ioutil.ReadAll(r.Body)
 
-	//TODO implemnter error 400
 	if err != nil {
-		log.Fatal(err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error Body " + err.Error())
+	} else {
+		var congressMan models.CongressMan
+
+		errJson := json.Unmarshal(body, &congressMan)
+
+		if errJson != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Println(err.Error())
+		}
+
+		lid := models.InsertCongressMan(&congressMan)
+		congressMan.Id = lid
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(congressMan)
 	}
-
-	var congressMan models.CongressMan
-
-	errJson := json.Unmarshal(body, &congressMan)
-
-	//TODO implémenter erreur 500
-	if errJson != nil {
-		log.Fatal(err)
-	}
-
-	lid := models.InsertCongressMan(&congressMan)
-	congressMan.Id = lid
-	json.NewEncoder(w).Encode(congressMan)
 }
 
 func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
-	//TODO implement error 404 if no existing congressman with this ID
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
-
-	//TODO implement error 400
 	if err != nil {
-		log.Fatal(err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error Body " + err.Error())
+	} else {
+		congressman := models.GetCongressMan(id)
+		if congressman == nil {
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Println("No congressman find with this id " + vars["id"])
+		} else {
+
+			body, errBody := ioutil.ReadAll(r.Body)
+			if errBody != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println(err.Error())
+			} else {
+				errJson := json.Unmarshal(body, &congressman)
+				if errJson != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					fmt.Println(err.Error())
+				} else {
+					models.UpdateCongressMan(congressman, id)
+					w.WriteHeader(http.StatusOK)
+
+					json.NewEncoder(w).Encode(congressman)
+				}
+			}
+		}
 	}
-
-	body, errBody := ioutil.ReadAll(r.Body)
-	//TODO implemnter error 400
-	if errBody != nil {
-		log.Fatal(errBody)
-	}
-
-	congressman := models.GetCongressMan(id)
-	errJson := json.Unmarshal(body, &congressman)
-	//TODO implemnter error 400
-	if errBody != nil {
-		log.Fatal(errJson)
-	}
-
-	models.UpdateCongressMan(congressman)
-
-	json.NewEncoder(w).Encode(congressman)
 }
 
 func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
-	//TODO implement error 404 if no existing congressman with this ID
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
 	vars := mux.Vars(r)
 
-	// strconv.Atoi is shorthand for ParseInt
 	id, err := strconv.Atoi(vars["id"])
-
 	if err != nil {
-		log.Fatal(err)
-	}
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error Body " + err.Error())
+	} else {
+		nbDelete := models.DeleteCongressMan(id)
 
-	models.DeleteCongressMan(id)
+		if nbDelete > 0 {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}
 }
