@@ -9,11 +9,13 @@ import (
 
 	"github.com/gorilla/mux"
 	models "github.com/plouiserre/exposecongressman/Models"
+	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
 func CongressMans(w http.ResponseWriter, r *http.Request) {
+	repo := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	congressmans, noError := models.AllCongressMans()
+	congressmans, noError := repo.AllCongressMans()
 
 	if noError {
 		w.WriteHeader(http.StatusOK)
@@ -24,6 +26,7 @@ func CongressMans(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressMan(w http.ResponseWriter, r *http.Request) {
+	repo := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -33,7 +36,7 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error cast " + err.Error())
 	} else {
-		congressman, noError := models.GetCongressMan(id)
+		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman != nil {
@@ -46,6 +49,7 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
+	repo := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -62,7 +66,7 @@ func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 		}
 
-		lid, noError := models.InsertCongressMan(&congressMan)
+		lid, noError := repo.InsertCongressMan(&congressMan)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
@@ -74,6 +78,7 @@ func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
+	repo := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -82,7 +87,7 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error Body " + err.Error())
 	} else {
-		congressman, noError := models.GetCongressMan(id)
+		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman == nil {
@@ -99,7 +104,7 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusBadRequest)
 					fmt.Println(err.Error())
 				} else {
-					noError := models.UpdateCongressMan(congressman, id)
+					noError := repo.UpdateCongressMan(congressman, id)
 					if !noError {
 						w.WriteHeader(http.StatusInternalServerError)
 					} else {
@@ -113,6 +118,7 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
+	repo := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -122,7 +128,7 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error Body " + err.Error())
 	} else {
-		nbDelete, noError := models.DeleteCongressMan(id)
+		nbDelete, noError := repo.DeleteCongressMan(id)
 
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -132,4 +138,9 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}
 	}
+}
+
+func InitCongressmanRepository() repository.CongressmanRepository {
+	congressManRepository := repository.CongressmanRepository{}
+	return congressManRepository
 }
