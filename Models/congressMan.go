@@ -42,74 +42,79 @@ func InitDB() (db *sql.DB) {
 	return db
 }
 
-func AllCongressMans() *CongressMans {  
+func AllCongressMans() (*CongressMans, bool) {
 	var congressMans CongressMans
 	db := InitDB()
+	noError := true
 
-	//TODO implémenter l'erreur 500
 	rows, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan;")
 
 	if err != nil {
 		//TODO mettre un système de log fichier
 		fmt.Println("Erreur requête " + err.Error())
-	}
+		noError = false
+	} else {
+		defer rows.Close()
 
-	defer rows.Close()
+		for rows.Next() {
+			var congressman CongressMan
+			err := rows.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+				&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+				&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+				&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
 
-	for rows.Next() {
-		var congressman CongressMan
-		err := rows.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
-			&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
-			&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
-			&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+			if err != nil {
+				//TODO mettre un système de log fichier
+				fmt.Println("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
 
-		if err != nil {
-			//TODO mettre un système de log fichier
-			fmt.Println("Erreur récupération du résultat " + err.Error())
+			congressMans = append(congressMans, congressman)
 		}
-
-		congressMans = append(congressMans, congressman)
 	}
 
-	return &congressMans
+	return &congressMans, noError
 }
 
-func GetCongressMan(id int) *CongressMan {
+func GetCongressMan(id int) (*CongressMan, bool) {
 	var congressman CongressMan
 	db := InitDB()
+	noError := true
 
-	//TODO implémenter l'erreur 500
 	row, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan where CongressManId=?;", id)
 
 	if err != nil {
 		//TODO mettre un système de log fichier
 		fmt.Println("Erreur requête " + err.Error())
-	}
-	if row.Next() {
-		errScan := row.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
-			&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
-			&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
-			&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
-
-		fmt.Println(congressman)
-
-		if errScan != nil {
-			//TODO mettre un système de log fichier
-			fmt.Println("Erreur récupération du résultat " + errScan.Error())
-		}
-
-	}
-	row.Close()
-	if congressman != (CongressMan{}) {
-		return &congressman
+		noError = false
 	} else {
-		return nil
+		if row.Next() {
+			errScan := row.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+				&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+				&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+				&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+
+			fmt.Println(congressman)
+
+			if errScan != nil {
+				//TODO mettre un système de log fichier
+				fmt.Println("Erreur récupération du résultat " + errScan.Error())
+				noError = false
+			}
+		}
+		row.Close()
+	}
+	if congressman != (CongressMan{}) {
+		return &congressman, noError
+	} else {
+		return nil, noError
 	}
 }
 
-func InsertCongressMan(congressman *CongressMan) int64 {
+func InsertCongressMan(congressman *CongressMan) (int64, bool) {
 	db := InitDB()
 	var lid int64
+	noError := true
 
 	if congressman == nil {
 		fmt.Println("No Data send to insert")
@@ -118,6 +123,7 @@ func InsertCongressMan(congressman *CongressMan) int64 {
 		stmt, errPrepare := db.Prepare(queryCongressMan)
 		if errPrepare != nil {
 			fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+			noError = false
 		} else {
 			res, errExec := stmt.Exec(congressman.Uid, congressman.Civility, congressman.FirstName,
 				congressman.LastName, congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
@@ -125,6 +131,7 @@ func InsertCongressMan(congressman *CongressMan) int64 {
 				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
 			if errExec != nil {
 				fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+				noError = false
 			} else {
 				var errGetLastId error
 				lid, errGetLastId = res.LastInsertId()
@@ -136,48 +143,52 @@ func InsertCongressMan(congressman *CongressMan) int64 {
 	}
 	defer db.Close()
 
-	return lid
+	return lid, noError
 }
 
-func UpdateCongressMan(congressman *CongressMan, id int) {
+func UpdateCongressMan(congressman *CongressMan, id int) bool {
 	db := InitDB()
+	noError := true
 
-	if congressman == nil {
-		fmt.Println("No Data send to Update")
+	queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=? WHERE CongressManId = ?"
+	stmt, errPrepare := db.Prepare(queryCongressMan)
+	if errPrepare != nil {
+		fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
 	} else {
-		queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=? WHERE CongressManId = ?"
-		stmt, errPrepare := db.Prepare(queryCongressMan)
-		if errPrepare != nil {
-			fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
-		} else {
-			_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
-				congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
-				congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
-				congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro, id)
-			if errExec != nil {
-				fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
-			}
+		_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
+			congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
+			congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
+			congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro, id)
+		if errExec != nil {
+			fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			noError = false
 		}
 	}
+
 	defer db.Close()
+	return noError
 }
 
-func DeleteCongressMan(id int) int64 {
+func DeleteCongressMan(id int) (int64, bool) {
 	var nbDelete int64
 	db := InitDB()
+	noError := true
 
 	queryCongressMan := "DELETE FROM PROCESSDEPUTES.Congressman WHERE CongressManId = ?"
 	stmt, errPrepare := db.Prepare(queryCongressMan)
 	if errPrepare != nil {
 		fmt.Println("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
 	} else {
 		result, errExec := stmt.Exec(id)
 		if errExec != nil {
 			fmt.Println("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			noError = false
 		}
 		nbDelete, _ = result.RowsAffected()
 	}
 	defer db.Close()
 
-	return nbDelete
+	return nbDelete, noError
 }
