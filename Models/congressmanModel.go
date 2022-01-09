@@ -1,6 +1,6 @@
 package Models
 
-type CongressMan struct {
+type CongressmanModel struct {
 	Id              int64  `json:"Id"`
 	Uid             string `json:"Uid"`
 	Civility        string `json:"Civility"`
@@ -17,4 +17,4 @@ type CongressMan struct {
 	FamSocPro       string `json:"FamSocPro"`
 }
 
-type CongressMans []CongressMan
+type CongressmansModel []CongressmanModel

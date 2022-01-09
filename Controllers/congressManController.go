@@ -2,18 +2,18 @@ package Controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
-func CongressMans(w http.ResponseWriter, r *http.Request) {
-	repo := InitCongressmanRepository()
+func Congressmans(w http.ResponseWriter, r *http.Request) {
+	repo, _ := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	congressmans, noError := repo.AllCongressMans()
 
@@ -25,8 +25,8 @@ func CongressMans(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CongressMan(w http.ResponseWriter, r *http.Request) {
-	repo := InitCongressmanRepository()
+func Congressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -34,7 +34,7 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error cast " + err.Error())
+		logManager.WriteErrorLog("Error cast " + err.Error())
 	} else {
 		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
@@ -48,61 +48,61 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
-	repo := InitCongressmanRepository()
+func CreateCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		var congressMan models.CongressMan
+		var congressman models.CongressmanModel
 
-		errJson := json.Unmarshal(body, &congressMan)
+		errJson := json.Unmarshal(body, &congressman)
 
 		if errJson != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Println(err.Error())
+			logManager.WriteErrorLog(err.Error())
 		}
 
-		lid, noError := repo.InsertCongressMan(&congressMan)
+		lid, noError := repo.InsertCongressMan(&congressman)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
-			congressMan.Id = lid
+			congressman.Id = lid
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(congressMan)
+			json.NewEncoder(w).Encode(congressman)
 		}
 	}
 }
 
-func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
-	repo := InitCongressmanRepository()
+func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
 		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman == nil {
 			w.WriteHeader(http.StatusNotFound)
-			fmt.Println("No congressman find with this id " + vars["id"])
+			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
 		} else {
 			body, errBody := ioutil.ReadAll(r.Body)
 			if errBody != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				fmt.Println(err.Error())
+				logManager.WriteErrorLog(err.Error())
 			} else {
 				errJson := json.Unmarshal(body, &congressman)
 				if errJson != nil {
 					w.WriteHeader(http.StatusBadRequest)
-					fmt.Println(err.Error())
+					logManager.WriteErrorLog(err.Error())
 				} else {
 					noError := repo.UpdateCongressMan(congressman, id)
 					if !noError {
@@ -117,8 +117,8 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
-	repo := InitCongressmanRepository()
+func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -126,7 +126,7 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
 		nbDelete, noError := repo.DeleteCongressMan(id)
 
@@ -140,7 +140,12 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func InitCongressmanRepository() repository.CongressmanRepository {
-	congressManRepository := repository.CongressmanRepository{}
-	return congressManRepository
+//TODO fixe this when you are multiple controller
+func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
+	logManager := Manager.LogManager{}
+	logManager.InitLog()
+	congressManRepository := repository.CongressmanRepository{
+		LogManager: &logManager,
+	}
+	return congressManRepository, logManager
 }
