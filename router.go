@@ -20,5 +20,11 @@ func InitializeRouter() *mux.Router {
 	router.HandleFunc("/deputy/{id}", controllers.UpdateDeputy).Methods("PUT")
 	router.HandleFunc("/deputy/{id}", controllers.DeleteDeputy).Methods("DELETE")
 
+	router.HandleFunc("/mandates/", controllers.Mandates).Methods("GET")
+	router.HandleFunc("/mandates/", controllers.CreateMandate).Methods("POST")
+	router.HandleFunc("/mandate/{id}", controllers.Mandate).Methods("GET")
+	router.HandleFunc("/mandate/{id}", controllers.UpdateMandate).Methods("PUT")
+	router.HandleFunc("/mandate/{id}", controllers.DeleteMandate).Methods("DELETE")
+
 	return router
 }
