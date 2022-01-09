@@ -2,18 +2,20 @@ package Controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
+	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
-func CongressMans(w http.ResponseWriter, r *http.Request) {
+func Congressmans(w http.ResponseWriter, r *http.Request) {
+	repo, _ := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	congressmans, noError := models.AllCongressMans()
+	congressmans, noError := repo.AllCongressMans()
 
 	if noError {
 		w.WriteHeader(http.StatusOK)
@@ -23,7 +25,8 @@ func CongressMans(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CongressMan(w http.ResponseWriter, r *http.Request) {
+func Congressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -31,9 +34,9 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error cast " + err.Error())
+		logManager.WriteErrorLog("Error cast " + err.Error())
 	} else {
-		congressman, noError := models.GetCongressMan(id)
+		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman != nil {
@@ -45,61 +48,63 @@ func CongressMan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateCongressMan(w http.ResponseWriter, r *http.Request) {
+func CreateCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		var congressMan models.CongressMan
+		var congressman models.CongressmanModel
 
-		errJson := json.Unmarshal(body, &congressMan)
+		errJson := json.Unmarshal(body, &congressman)
 
 		if errJson != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Println(err.Error())
+			logManager.WriteErrorLog(err.Error())
 		}
 
-		lid, noError := models.InsertCongressMan(&congressMan)
+		lid, noError := repo.InsertCongressMan(&congressman)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
-			congressMan.Id = lid
+			congressman.Id = lid
 			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(congressMan)
+			json.NewEncoder(w).Encode(congressman)
 		}
 	}
 }
 
-func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
+func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		congressman, noError := models.GetCongressMan(id)
+		congressman, noError := repo.GetCongressMan(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman == nil {
 			w.WriteHeader(http.StatusNotFound)
-			fmt.Println("No congressman find with this id " + vars["id"])
+			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
 		} else {
 			body, errBody := ioutil.ReadAll(r.Body)
 			if errBody != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				fmt.Println(err.Error())
+				logManager.WriteErrorLog(err.Error())
 			} else {
 				errJson := json.Unmarshal(body, &congressman)
 				if errJson != nil {
 					w.WriteHeader(http.StatusBadRequest)
-					fmt.Println(err.Error())
+					logManager.WriteErrorLog(err.Error())
 				} else {
-					noError := models.UpdateCongressMan(congressman, id)
+					noError := repo.UpdateCongressMan(congressman, id)
 					if !noError {
 						w.WriteHeader(http.StatusInternalServerError)
 					} else {
@@ -112,7 +117,8 @@ func UpdateCongressMan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
+func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitCongressmanRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -120,9 +126,9 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error Body " + err.Error())
+		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		nbDelete, noError := models.DeleteCongressMan(id)
+		nbDelete, noError := repo.DeleteCongressMan(id)
 
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -132,4 +138,14 @@ func DeleteCongressMan(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}
 	}
+}
+
+//TODO fixe this when you are multiple controller
+func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
+	logManager := Manager.LogManager{}
+	logManager.InitLog()
+	congressManRepository := repository.CongressmanRepository{
+		LogManager: &logManager,
+	}
+	return congressManRepository, logManager
 }
