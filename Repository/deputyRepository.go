@@ -8,11 +8,11 @@ import (
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
-type deputyRepository struct {
+type DeputyRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (dr *deputyRepository) InitDB() (db *sql.DB) {
+func (dr *DeputyRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {
@@ -26,7 +26,7 @@ func (dr *deputyRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (dr *deputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
+func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	var deputies models.DeputiesModel
 	db := dr.InitDB()
 	noError := true
@@ -55,7 +55,7 @@ func (dr *deputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	return &deputies, noError
 }
 
-func (dr *deputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
+func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 	var deputy models.DeputyModel
 	db := dr.InitDB()
 	noError := true
@@ -83,7 +83,7 @@ func (dr *deputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 	}
 }
 
-func (dr *deputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, bool) {
+func (dr *DeputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, bool) {
 	db := dr.InitDB()
 	var lid int64
 	noError := true
@@ -115,7 +115,7 @@ func (dr *deputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, boo
 	return lid, noError
 }
 
-func (dr *deputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) bool {
+func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) bool {
 	db := dr.InitDB()
 	noError := true
 
@@ -136,7 +136,7 @@ func (dr *deputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) boo
 	return noError
 }
 
-func (dr *deputyRepository) DeleteDeputy(id int) (int64, bool) {
+func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {
 	var nbDelete int64
 	db := dr.InitDB()
 	noError := true
