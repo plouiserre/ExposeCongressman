@@ -140,7 +140,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//TODO fixe this when you are multiple controller
+//TODO fixe this when you are multiple controllers
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
 	logManager := Manager.LogManager{}
 	logManager.InitLog()
