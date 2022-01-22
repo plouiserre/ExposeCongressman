@@ -144,8 +144,8 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
 	logManager := Manager.LogManager{}
 	logManager.InitLog()
-	congressManRepository := repository.CongressmanRepository{
+	congressmanRepository := repository.CongressmanRepository{
 		LogManager: &logManager,
 	}
-	return congressManRepository, logManager
+	return congressmanRepository, logManager
 }
