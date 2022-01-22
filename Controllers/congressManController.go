@@ -133,7 +133,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if nbDelete > 0 {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -144,8 +144,8 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
 	logManager := Manager.LogManager{}
 	logManager.InitLog()
-	congressManRepository := repository.CongressmanRepository{
+	congressmanRepository := repository.CongressmanRepository{
 		LogManager: &logManager,
 	}
-	return congressManRepository, logManager
+	return congressmanRepository, logManager
 }
