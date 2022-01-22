@@ -2,7 +2,6 @@ package Controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -120,10 +119,26 @@ func UpdateMandate(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitMandateRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
-	fmt.Println("DeleteMandate called")
+	vars := mux.Vars(r)
+
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error Body " + err.Error())
+	} else {
+		nbDelete, noError := repo.DeleteMandate(id)
+
+		if !noError {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else if nbDelete > 0 {
+			w.WriteHeader(http.StatusNoContent)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}
 }
 
 //TODO fixe this when you are multiple controllers
