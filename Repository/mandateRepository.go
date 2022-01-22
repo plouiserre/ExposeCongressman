@@ -44,7 +44,7 @@ func (mr *MandateRepository) AllMandates() (*models.MandatesModel, bool) {
 		for rows.Next() {
 			var mandate models.MandateModel
 			err := rows.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
-				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNaming,
+				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNoming,
 				&mandate.QualityCode, &mandate.QualityLabel, &mandate.QualityLabelSex,
 				&mandate.RefBody, &mandate.CongressmanId)
 
@@ -73,7 +73,7 @@ func (mr *MandateRepository) GetMandate(id int) (*models.MandateModel, bool) {
 	} else {
 		if row.Next() {
 			errScan := row.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
-				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNaming,
+				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNoming,
 				&mandate.QualityCode, &mandate.QualityLabel, &mandate.QualityLabelSex,
 				&mandate.RefBody, &mandate.CongressmanId)
 
@@ -99,14 +99,14 @@ func (mr *MandateRepository) InsertMandate(mandate *models.MandateModel) (int64,
 	if mandate == nil {
 		mr.LogManager.WriteErrorLog("No Data send to insert")
 	} else {
-		queryMandate := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, StartDate, EndDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+		queryMandate := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, EndDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
 		stmt, errPrepare := db.Prepare(queryMandate)
 		if errPrepare != nil {
 			mr.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
 			noError = false
 		} else {
-			res, errExec := stmt.Exec(mandate.Id, mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate, mandate.EndDate,
-				mandate.Precedence, mandate.PrincipleNaming, mandate.QualityCode, mandate.QualityLabel, mandate.QualityLabelSex,
+			res, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate, mandate.EndDate,
+				mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel, mandate.QualityLabelSex,
 				mandate.RefBody, mandate.CongressmanId)
 			if errExec != nil {
 				mr.LogManager.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
@@ -125,21 +125,21 @@ func (mr *MandateRepository) InsertMandate(mandate *models.MandateModel) (int64,
 	return lid, noError
 }
 
-func (mr *MandateRepository) UpdateCongressMan(mandate *models.MandateModel, id int) bool {
+func (mr *MandateRepository) UpdateMandate(mandate *models.MandateModel, id int) bool {
 	db := mr.InitDB()
 	noError := true
 
-	queryMandate := "UPDATE  PROCESSDEPUTES.Mandate SET MandateUid=?, TermOffice=?, StartDate=?, EndDate=?, Precedence=?, PrincipleNoming=?, QualityCode=?, QualityLabel=?, QualityLabelSex=?, RefBody=?, CongressManId=? WHERE MandateId = ?"
+	queryMandate := "UPDATE  PROCESSDEPUTES.Mandate SET MandateUid=?, TermOffice=?, TypeOrgane=?,StartDate=?, EndDate=?, Precedence=?, PrincipleNoming=?, QualityCode=?, QualityLabel=?, QualityLabelSex=?, RefBody=?, CongressManId=? WHERE MandateId = ?"
 	stmt, errPrepare := db.Prepare(queryMandate)
 	if errPrepare != nil {
 		mr.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
 		noError = false
 	} else {
-		_, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.StartDate, mandate.EndDate, mandate.Precedence,
-			mandate.PrincipleNaming, mandate.QualityCode, mandate.QualityLabel, mandate.QualityLabelSex,
-			mandate.RefBody, id)
+		_, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate,
+			mandate.EndDate, mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel,
+			mandate.QualityLabelSex, mandate.RefBody, mandate.CongressmanId, id)
 		if errExec != nil {
-			mr.LogManager.WriteErrorLog("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			mr.LogManager.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 			noError = false
 		}
 	}
@@ -148,20 +148,20 @@ func (mr *MandateRepository) UpdateCongressMan(mandate *models.MandateModel, id 
 	return noError
 }
 
-func (mr *MandateRepository) DeleteCongressMan(id int) (int64, bool) {
+func (mr *MandateRepository) DeleteMandate(id int) (int64, bool) {
 	var nbDelete int64
 	db := mr.InitDB()
 	noError := true
 
-	queryCongressMan := "DELETE FROM PROCESSDEPUTES.Mandate WHERE MandateId = ?"
-	stmt, errPrepare := db.Prepare(queryCongressMan)
+	queryMandate := "DELETE FROM PROCESSDEPUTES.Mandate WHERE MandateId = ?"
+	stmt, errPrepare := db.Prepare(queryMandate)
 	if errPrepare != nil {
 		mr.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
 		noError = false
 	} else {
 		result, errExec := stmt.Exec(id)
 		if errExec != nil {
-			mr.LogManager.WriteErrorLog("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			mr.LogManager.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 			noError = false
 		}
 		nbDelete, _ = result.RowsAffected()

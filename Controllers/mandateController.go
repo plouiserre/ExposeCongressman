@@ -3,11 +3,13 @@ package Controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/plouiserre/exposecongressman/Manager"
+	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
@@ -24,6 +26,7 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//TODO voir comment factoriser entre les autres méthodes GET
 func Mandate(w http.ResponseWriter, r *http.Request) {
 	repo, logManager := InitMandateRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
@@ -48,17 +51,72 @@ func Mandate(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitMandateRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	body, err := ioutil.ReadAll(r.Body)
 
-	fmt.Println("CreateMandate called")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error Body " + err.Error())
+	} else {
+		var mandate models.MandateModel
+
+		errJson := json.Unmarshal(body, &mandate)
+
+		if errJson != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			logManager.WriteErrorLog(err.Error())
+		}
+
+		lid, noError := repo.InsertMandate(&mandate)
+		if !noError {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			mandate.Id = lid
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(mandate)
+		}
+	}
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {
+	repo, logManager := InitMandateRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
-	fmt.Println("UpdateMandate called")
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error Body " + err.Error())
+	} else {
+		mandate, noError := repo.GetMandate(id)
+		if !noError {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else if mandate == nil {
+			w.WriteHeader(http.StatusNotFound)
+			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
+		} else {
+			body, errBody := ioutil.ReadAll(r.Body)
+			if errBody != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				logManager.WriteErrorLog(err.Error())
+			} else {
+				errJson := json.Unmarshal(body, &mandate)
+				if errJson != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					logManager.WriteErrorLog(err.Error())
+				} else {
+					noError := repo.UpdateMandate(mandate, id)
+					if !noError {
+						w.WriteHeader(http.StatusInternalServerError)
+					} else {
+						w.WriteHeader(http.StatusOK)
+						json.NewEncoder(w).Encode(mandate)
+					}
+				}
+			}
+		}
+	}
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {

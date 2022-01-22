@@ -10,7 +10,7 @@ type MandateModel struct {
 	StartDate       string         `json:"StartDate"`
 	EndDate         sql.NullString `json:"EndDate"`
 	Precedence      string         `json:"Precedence"`
-	PrincipleNaming string         `json:"PrincipleNaming"`
+	PrincipleNoming string         `json:"PrincipleNoming"`
 	QualityCode     string         `json:"QualityCode"`
 	QualityLabel    string         `json:"QualityLabel"`
 	QualityLabelSex string         `json:"QualityLabelSex"`
