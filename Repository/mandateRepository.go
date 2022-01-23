@@ -14,7 +14,7 @@ type MandateRepository struct {
 }
 
 //TODO factoriser avec les autres repository
-func (mr *MandateRepository) InitDB() (db *sql.DB) {
+func (mr MandateRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {

@@ -13,7 +13,7 @@ type CongressmanRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (cr *CongressmanRepository) InitDB() (db *sql.DB) {
+func (cr CongressmanRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {

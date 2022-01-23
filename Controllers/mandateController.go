@@ -10,6 +10,7 @@ import (
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
+	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Mandates(w http.ResponseWriter, r *http.Request) {
@@ -141,12 +142,9 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//TODO fixe this when you are multiple controllers
 func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {
-	logManager := Manager.LogManager{}
-	logManager.InitLog()
-	mandateRepository := repository.MandateRepository{
-		LogManager: &logManager,
-	}
-	return mandateRepository, logManager
+	entityService := services.EntityService{}
+	repo, logManager := entityService.InitRepository(2)
+	mandateRepo := repo.(repository.MandateRepository)
+	return mandateRepo, logManager
 }

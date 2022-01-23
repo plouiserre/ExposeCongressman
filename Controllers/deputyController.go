@@ -10,6 +10,7 @@ import (
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
+	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Deputies(w http.ResponseWriter, r *http.Request) {
@@ -137,12 +138,9 @@ func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//TODO fixe this when you are multiple controllers
 func InitDeputyRepository() (repository.DeputyRepository, Manager.LogManager) {
-	logManager := Manager.LogManager{}
-	logManager.InitLog()
-	deputyRepository := repository.DeputyRepository{
-		LogManager: &logManager,
-	}
-	return deputyRepository, logManager
+	entityService := services.EntityService{}
+	repo, logManager := entityService.InitRepository(2)
+	deputyRepo := repo.(repository.DeputyRepository)
+	return deputyRepo, logManager
 }

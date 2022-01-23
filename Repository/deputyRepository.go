@@ -12,7 +12,7 @@ type DeputyRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (dr *DeputyRepository) InitDB() (db *sql.DB) {
+func (dr DeputyRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {
