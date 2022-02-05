@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
@@ -15,15 +16,12 @@ import (
 
 func Deputies(w http.ResponseWriter, r *http.Request) {
 	repo, _ := InitDeputyRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	deputies, noError := repo.AllDeputies()
 
-	if noError {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(deputies)
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
+	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
+		W: w,
 	}
+
+	GetAll(deputyJsonEncoder, r, repo)
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {

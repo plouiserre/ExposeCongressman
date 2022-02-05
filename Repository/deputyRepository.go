@@ -27,7 +27,7 @@ func (dr DeputyRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
+/*func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	var deputies models.DeputiesModel
 	db := dr.InitDB()
 	noError := true
@@ -54,10 +54,37 @@ func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	}
 
 	return &deputies, noError
-}
+}*/
 
 func (dr DeputyRepository) GetAll() (*models.EntityModel, bool) {
-	return nil, false
+	var deputies models.DeputiesModel
+	var entities models.EntityModel
+	db := dr.InitDB()
+	noError := true
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.Deputy;")
+
+	if err != nil {
+		dr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var deputy models.DeputyModel
+			err := rows.Scan(&deputy.Id, &deputy.StartDate, &deputy.EndDate, &deputy.RefDeputy, &deputy.MandateId)
+
+			if err != nil {
+				dr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
+
+			deputies = append(deputies, deputy)
+		}
+		entities.Deputies = deputies
+	}
+
+	return &entities, noError
 }
 
 func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
