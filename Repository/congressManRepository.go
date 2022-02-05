@@ -28,7 +28,7 @@ func (cr CongressmanRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, bool) {
+/*func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, bool) {
 	var congressMans models.CongressmansModel
 	db := cr.InitDB()
 	noError := true
@@ -58,10 +58,40 @@ func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, b
 	}
 
 	return &congressMans, noError
-}
+}*/
 
 func (cr CongressmanRepository) GetAll() (*models.EntityModel, bool) {
-	return nil, false
+	var congressmans models.CongressmansModel
+	var entities models.EntityModel
+	db := cr.InitDB()
+	noError := true
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan;")
+
+	if err != nil {
+		cr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var congressman models.CongressmanModel
+			err := rows.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+				&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+				&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+				&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+
+			if err != nil {
+				cr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
+
+			congressmans = append(congressmans, congressman)
+		}
+		entities.Congressmans = congressmans
+	}
+
+	return &entities, noError
 }
 
 func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanModel, bool) {
