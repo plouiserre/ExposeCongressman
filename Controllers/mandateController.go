@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
@@ -15,15 +16,12 @@ import (
 
 func Mandates(w http.ResponseWriter, r *http.Request) {
 	repo, _ := InitMandateRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	mandates, noError := repo.AllMandates()
 
-	if noError {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(mandates)
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
+	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
+		W: w,
 	}
+
+	GetAll(MandateJsonEncoder, r, repo)
 }
 
 //TODO voir comment factoriser entre les autres méthodes GET
@@ -144,7 +142,7 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 
 func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {
 	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(2)
+	repo, logManager := entityService.InitRepository(1)
 	mandateRepo := repo.(repository.MandateRepository)
 	return mandateRepo, logManager
 }

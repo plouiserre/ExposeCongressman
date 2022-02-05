@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/plouiserre/exposecongressman/Manager"
 	manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
@@ -53,6 +54,10 @@ func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	}
 
 	return &deputies, noError
+}
+
+func (dr DeputyRepository) GetAll() (*models.EntityModel, bool) {
+	return nil, false
 }
 
 func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
@@ -157,4 +162,8 @@ func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {
 	defer db.Close()
 
 	return nbDelete, noError
+}
+
+func (dr DeputyRepository) InitRepository() (IRepository, Manager.LogManager) {
+	return nil, manager.LogManager{}
 }

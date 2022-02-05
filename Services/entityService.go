@@ -2,6 +2,7 @@ package Service
 
 import (
 	"github.com/plouiserre/exposecongressman/Manager"
+	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
@@ -39,4 +40,10 @@ func (entityService *EntityService) InitRepository(entityType int) (repository.I
 		}
 		return deputyRepository, logManager
 	}
+}
+
+func (entityService EntityService) GetAll(repo repository.IRepository) (*models.EntityModel, bool) {
+	entities, noError := repo.GetAll()
+
+	return entities, noError
 }

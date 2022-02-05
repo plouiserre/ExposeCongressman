@@ -5,6 +5,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/plouiserre/exposecongressman/Manager"
 	manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
@@ -57,6 +58,10 @@ func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, b
 	}
 
 	return &congressMans, noError
+}
+
+func (cr CongressmanRepository) GetAll() (*models.EntityModel, bool) {
+	return nil, false
 }
 
 func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanModel, bool) {
@@ -170,4 +175,8 @@ func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
 	defer db.Close()
 
 	return nbDelete, noError
+}
+
+func (cr CongressmanRepository) InitRepository() (IRepository, Manager.LogManager) {
+	return nil, manager.LogManager{}
 }
