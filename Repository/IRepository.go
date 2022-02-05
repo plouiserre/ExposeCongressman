@@ -11,5 +11,5 @@ type IRepository interface {
 	InitDB() (db *sql.DB)
 	//TODO modifier le retour de AllMandates
 	GetAll() (*models.EntityModel, bool)
-	//InitRepository() (IRepository, Manager.LogManager)
+	GetById(id int) (*models.EntityModel, bool)
 }

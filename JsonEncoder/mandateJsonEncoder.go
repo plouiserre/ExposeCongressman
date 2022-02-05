@@ -15,6 +15,10 @@ func (mj MandateJsonEncoder) EncodeEntities(entityModel models.EntityModel) {
 	json.NewEncoder(mj.W).Encode(entityModel.Mandates)
 }
 
+func (mj MandateJsonEncoder) EncodeEntity(model models.EntityModel) {
+	json.NewEncoder(mj.W).Encode(model.Mandate)
+}
+
 func (mj MandateJsonEncoder) WriteHeader(statusCode int) {
 	mj.W.WriteHeader(statusCode)
 }

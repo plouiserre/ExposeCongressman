@@ -15,6 +15,10 @@ func (cj CongressmanJsonEncoder) EncodeEntities(entityModel models.EntityModel) 
 	json.NewEncoder(cj.W).Encode(entityModel.Congressmans)
 }
 
+func (cj CongressmanJsonEncoder) EncodeEntity(model models.EntityModel) {
+
+}
+
 func (cj CongressmanJsonEncoder) WriteHeader(statusCode int) {
 	cj.W.WriteHeader(statusCode)
 }

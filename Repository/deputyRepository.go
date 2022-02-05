@@ -115,6 +115,10 @@ func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 	}
 }
 
+func (dr DeputyRepository) GetById(id int) (*models.EntityModel, bool) {
+	return nil, false
+}
+
 func (dr *DeputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, bool) {
 	db := dr.InitDB()
 	var lid int64

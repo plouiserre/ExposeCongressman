@@ -26,26 +26,13 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 
 //TODO voir comment factoriser entre les autres méthodes GET
 func Mandate(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitMandateRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitMandateRepository()
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error cast " + err.Error())
-	} else {
-		mandate, noError := repo.GetMandate(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if mandate != nil {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(mandate)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
+	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
+		W: w,
 	}
+
+	GetById(MandateJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {

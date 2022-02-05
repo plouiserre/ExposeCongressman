@@ -125,6 +125,10 @@ func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanMode
 	}
 }
 
+func (cr CongressmanRepository) GetById(id int) (*models.EntityModel, bool) {
+	return nil, false
+}
+
 func (cr *CongressmanRepository) InsertCongressMan(congressman *models.CongressmanModel) (int64, bool) {
 	db := cr.InitDB()
 	var lid int64

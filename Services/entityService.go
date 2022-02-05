@@ -47,3 +47,9 @@ func (entityService EntityService) GetAll(repo repository.IRepository) (*models.
 
 	return entities, noError
 }
+
+func (entityService EntityService) GetById(id int, repo repository.IRepository) (*models.EntityModel, bool) {
+	entity, noError := repo.GetById(id)
+
+	return entity, noError
+}
