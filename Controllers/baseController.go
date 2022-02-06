@@ -29,7 +29,7 @@ func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposito
 }
 
 //TODO optimiser les paramètres de la méthode et de entityService
-func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
+func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, entityName string, logManager Manager.LogManager) {
 	jsonEncoder.SetHeader()
 
 	entityService := services.EntityService{}
@@ -44,11 +44,14 @@ func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposit
 		entity, noError := entityService.GetById(id, repo)
 		if !noError {
 			jsonEncoder.WriteHeader(http.StatusInternalServerError)
+			logManager.WriteErrorLog("Error during the recovery of the entity")
 		} else if entity != nil {
 			jsonEncoder.WriteHeader(http.StatusOK)
 			jsonEncoder.EncodeEntity(*entity)
 		} else {
+			badId := strconv.Itoa(id)
 			jsonEncoder.WriteHeader(http.StatusNotFound)
+			logManager.WriteErrorLog("No " + entityName + " with the Id " + badId)
 		}
 	}
 }

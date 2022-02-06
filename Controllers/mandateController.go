@@ -32,7 +32,7 @@ func Mandate(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetById(MandateJsonEncoder, r, repo, *repo.LogManager)
+	GetById(MandateJsonEncoder, r, repo, "mandate", *repo.LogManager)
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {

@@ -31,7 +31,7 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetById(congressmanJsonEncoder, r, repo, *repo.LogManager)
+	GetById(congressmanJsonEncoder, r, repo, "congressman", *repo.LogManager)
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
