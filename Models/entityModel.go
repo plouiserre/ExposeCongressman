@@ -7,4 +7,5 @@ type EntityModel struct {
 	Deputies     DeputiesModel
 	Deputy       DeputyModel
 	Congressmans CongressmansModel
+	Congressman  CongressmanModel
 }

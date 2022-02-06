@@ -25,26 +25,6 @@ func Deputies(w http.ResponseWriter, r *http.Request) {
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {
-	/*repo, logManager := InitDeputyRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error cast " + err.Error())
-	} else {
-		deputy, noError := repo.GetDeputy(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if deputy != nil {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(deputy)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
-	}*/
 	repo, _ := InitDeputyRepository()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{

@@ -25,26 +25,13 @@ func Congressmans(w http.ResponseWriter, r *http.Request) {
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitCongressmanRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitCongressmanRepository()
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error cast " + err.Error())
-	} else {
-		congressman, noError := repo.GetCongressMan(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if congressman != nil {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(congressman)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
+	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
+		W: w,
 	}
+
+	GetById(congressmanJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +73,7 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		congressman, noError := repo.GetCongressMan(id)
+		congressman, noError := repo.GetCongressman(id)
 		if !noError {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else if congressman == nil {

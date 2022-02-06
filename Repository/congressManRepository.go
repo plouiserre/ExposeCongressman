@@ -94,7 +94,7 @@ func (cr CongressmanRepository) GetAll() (*models.EntityModel, bool) {
 	return &entities, noError
 }
 
-func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanModel, bool) {
+func (cr *CongressmanRepository) GetCongressman(id int) (*models.CongressmanModel, bool) {
 	var congressman models.CongressmanModel
 	db := cr.InitDB()
 	noError := true
@@ -126,7 +126,16 @@ func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanMode
 }
 
 func (cr CongressmanRepository) GetById(id int) (*models.EntityModel, bool) {
-	return nil, false
+	var entity models.EntityModel
+
+	congressman, noError := cr.GetCongressman(id)
+
+	if congressman != nil {
+		entity.Congressman = *congressman
+		return &entity, noError
+	} else {
+		return nil, noError
+	}
 }
 
 func (cr *CongressmanRepository) InsertCongressMan(congressman *models.CongressmanModel) (int64, bool) {
