@@ -87,6 +87,7 @@ func (dr DeputyRepository) GetAll() (*models.EntityModel, bool) {
 	return &entities, noError
 }
 
+//TODO à supprimer quand l'update du controller sera fait
 func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 	var deputy models.DeputyModel
 	db := dr.InitDB()
@@ -108,6 +109,7 @@ func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 		}
 		row.Close()
 	}
+
 	if deputy != (models.DeputyModel{}) {
 		return &deputy, noError
 	} else {
@@ -116,7 +118,16 @@ func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 }
 
 func (dr DeputyRepository) GetById(id int) (*models.EntityModel, bool) {
-	return nil, false
+	var entity models.EntityModel
+
+	deputy, noError := dr.GetDeputy(id)
+
+	if deputy != nil {
+		entity.Deputy = *deputy
+		return &entity, noError
+	} else {
+		return nil, noError
+	}
 }
 
 func (dr *DeputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, bool) {

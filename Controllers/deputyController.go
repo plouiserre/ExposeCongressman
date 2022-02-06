@@ -25,7 +25,7 @@ func Deputies(w http.ResponseWriter, r *http.Request) {
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitDeputyRepository()
+	/*repo, logManager := InitDeputyRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -44,7 +44,14 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
+	}*/
+	repo, _ := InitDeputyRepository()
+
+	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
+		W: w,
 	}
+
+	GetById(deputyJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {

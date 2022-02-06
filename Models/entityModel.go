@@ -5,5 +5,6 @@ type EntityModel struct {
 	Mandates     MandatesModel
 	Mandate      MandateModel
 	Deputies     DeputiesModel
+	Deputy       DeputyModel
 	Congressmans CongressmansModel
 }

@@ -125,15 +125,18 @@ func (mr *MandateRepository) GetMandate(id int) (*models.MandateModel, bool) {
 	} else {
 		return nil, noError
 	}
-
 }
 
 func (mr MandateRepository) GetById(id int) (*models.EntityModel, bool) {
 	var entity models.EntityModel
 
 	mandate, noError := mr.GetMandate(id)
-	entity.Mandate = *mandate
-	return &entity, noError
+	if mandate != nil {
+		entity.Mandate = *mandate
+		return &entity, noError
+	} else {
+		return nil, noError
+	}
 }
 
 func (mr *MandateRepository) InsertMandate(mandate *models.MandateModel) (int64, bool) {

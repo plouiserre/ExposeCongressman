@@ -16,7 +16,7 @@ func (dj DeputyJsonEncoder) EncodeEntities(entityModel models.EntityModel) {
 }
 
 func (dj DeputyJsonEncoder) EncodeEntity(model models.EntityModel) {
-
+	json.NewEncoder(dj.W).Encode(model.Deputy)
 }
 
 func (dj DeputyJsonEncoder) WriteHeader(statusCode int) {
