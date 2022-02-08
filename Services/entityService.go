@@ -53,3 +53,9 @@ func (entityService EntityService) GetById(id int, repo repository.IRepository) 
 
 	return entity, noError
 }
+
+func (entityService EntityService) CreateEntity(repo repository.IRepository, entity *models.EntityModel) (int64, bool) {
+	lid, noError := repo.CreateEntity(entity)
+
+	return lid, noError
+}

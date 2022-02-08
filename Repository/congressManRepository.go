@@ -173,6 +173,10 @@ func (cr *CongressmanRepository) InsertCongressMan(congressman *models.Congressm
 	return lid, noError
 }
 
+func (cr CongressmanRepository) CreateEntity(*models.EntityModel) (int64, bool) {
+	return 0, false
+}
+
 func (cr *CongressmanRepository) UpdateCongressMan(congressman *models.CongressmanModel, id int) bool {
 	db := cr.InitDB()
 	noError := true

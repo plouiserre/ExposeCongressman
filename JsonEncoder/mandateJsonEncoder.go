@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	Manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -25,4 +26,27 @@ func (mj MandateJsonEncoder) WriteHeader(statusCode int) {
 
 func (mj MandateJsonEncoder) SetHeader() {
 	mj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
+}
+
+func (mj MandateJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
+	var mandate models.MandateModel
+	var entityResult models.EntityModel
+
+	errJson := json.Unmarshal(body, &mandate)
+
+	if errJson != nil {
+		mj.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog(errJson.Error())
+	}
+
+	entityResult.Mandate = mandate
+	return entityResult
+}
+
+func (mj MandateJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
+	mandate := model.Mandate
+	mandate.Id = lid
+	mj.WriteHeader(http.StatusCreated)
+	//TODO à améliorer
+	mj.EncodeEntity(model)
 }

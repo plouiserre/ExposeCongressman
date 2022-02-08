@@ -162,6 +162,10 @@ func (dr *DeputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, boo
 	return lid, noError
 }
 
+func (dr DeputyRepository) CreateEntity(*models.EntityModel) (int64, bool) {
+	return 0, false
+}
+
 func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) bool {
 	db := dr.InitDB()
 	noError := true

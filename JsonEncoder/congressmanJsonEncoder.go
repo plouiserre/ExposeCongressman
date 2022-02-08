@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	Manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -25,4 +26,12 @@ func (cj CongressmanJsonEncoder) WriteHeader(statusCode int) {
 
 func (cj CongressmanJsonEncoder) SetHeader() {
 	cj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
+}
+
+func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
+	return models.EntityModel{}
+}
+
+func (cj CongressmanJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
+
 }

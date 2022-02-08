@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -52,6 +53,27 @@ func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposit
 			badId := strconv.Itoa(id)
 			jsonEncoder.WriteHeader(http.StatusNotFound)
 			logManager.WriteErrorLog("No " + entityName + " with the Id " + badId)
+		}
+	}
+}
+
+func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
+	jsonEncoder.SetHeader()
+
+	entityService := services.EntityService{}
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		jsonEncoder.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error Body " + err.Error())
+	} else {
+		entity := jsonEncoder.UnmarshalEntity(body, logManager)
+		lid, noError := entityService.CreateEntity(repo, &entity)
+		if !noError {
+			jsonEncoder.WriteHeader(http.StatusInternalServerError)
+		} else {
+			jsonEncoder.ResponseEntityCreated(entity, lid)
 		}
 	}
 }

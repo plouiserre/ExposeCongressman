@@ -12,4 +12,5 @@ type IRepository interface {
 	//TODO modifier le retour de AllMandates
 	GetAll() (*models.EntityModel, bool)
 	GetById(id int) (*models.EntityModel, bool)
+	CreateEntity(*models.EntityModel) (int64, bool)
 }

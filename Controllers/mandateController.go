@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
-	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
@@ -24,7 +23,6 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 	GetAll(MandateJsonEncoder, r, repo)
 }
 
-//TODO voir comment factoriser entre les autres méthodes GET
 func Mandate(w http.ResponseWriter, r *http.Request) {
 	repo, _ := InitMandateRepository()
 
@@ -36,32 +34,12 @@ func Mandate(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitMandateRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	body, err := ioutil.ReadAll(r.Body)
+	repo, _ := InitMandateRepository()
 
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		var mandate models.MandateModel
-
-		errJson := json.Unmarshal(body, &mandate)
-
-		if errJson != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			logManager.WriteErrorLog(err.Error())
-		}
-
-		lid, noError := repo.InsertMandate(&mandate)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else {
-			mandate.Id = lid
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(mandate)
-		}
+	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
+		W: w,
 	}
+	CreateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,7 @@
 package JsonEncoder
 
 import (
+	Manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -9,4 +10,6 @@ type IJsonEncoder interface {
 	EncodeEntities(models models.EntityModel)
 	EncodeEntity(model models.EntityModel)
 	SetHeader()
+	UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel
+	ResponseEntityCreated(model models.EntityModel, lid int64)
 }

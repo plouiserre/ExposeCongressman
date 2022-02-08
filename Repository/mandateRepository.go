@@ -173,6 +173,12 @@ func (mr *MandateRepository) InsertMandate(mandate *models.MandateModel) (int64,
 	return lid, noError
 }
 
+func (mr MandateRepository) CreateEntity(entity *models.EntityModel) (int64, bool) {
+	lid, noError := mr.InsertMandate(&entity.Mandate)
+
+	return lid, noError
+}
+
 func (mr *MandateRepository) UpdateMandate(mandate *models.MandateModel, id int) bool {
 	db := mr.InitDB()
 	noError := true
