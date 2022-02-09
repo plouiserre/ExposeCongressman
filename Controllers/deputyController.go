@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
-	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
@@ -35,7 +34,7 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitDeputyRepository()
+	/*repo, logManager := InitDeputyRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -57,7 +56,14 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(deputy)
 		}
+	}*/
+	repo, _ := InitDeputyRepository()
+
+	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
+		W: w,
 	}
+
+	CreateEntity(deputyJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {

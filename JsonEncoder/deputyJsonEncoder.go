@@ -29,9 +29,22 @@ func (dj DeputyJsonEncoder) SetHeader() {
 }
 
 func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
-	return models.EntityModel{}
+	var deputy models.DeputyModel
+	var entityResult models.EntityModel
+
+	errJson := json.Unmarshal(body, &deputy)
+
+	if errJson != nil {
+		dj.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog(errJson.Error())
+	}
+	entityResult.Deputy = deputy
+	return entityResult
 }
 
 func (dj DeputyJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-
+	deputy := model.Deputy
+	deputy.Id = lid
+	dj.WriteHeader(http.StatusCreated)
+	dj.EncodeEntity(model)
 }
