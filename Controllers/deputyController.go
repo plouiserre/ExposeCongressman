@@ -34,29 +34,6 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {
-	/*repo, logManager := InitDeputyRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		var deputy models.DeputyModel
-		errJson := json.Unmarshal(body, &deputy)
-
-		if errJson != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			logManager.WriteErrorLog(err.Error())
-		}
-		lid, noError := repo.InsertDeputy(&deputy)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else {
-			deputy.Id = lid
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(deputy)
-		}
-	}*/
 	repo, _ := InitDeputyRepository()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
