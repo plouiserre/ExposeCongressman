@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
-	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
@@ -35,32 +34,13 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitCongressmanRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	body, err := ioutil.ReadAll(r.Body)
+	repo, _ := InitCongressmanRepository()
 
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		var congressman models.CongressmanModel
-
-		errJson := json.Unmarshal(body, &congressman)
-
-		if errJson != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			logManager.WriteErrorLog(err.Error())
-		}
-
-		lid, noError := repo.InsertCongressMan(&congressman)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else {
-			congressman.Id = lid
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(congressman)
-		}
+	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
+		W: w,
 	}
+
+	CreateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {

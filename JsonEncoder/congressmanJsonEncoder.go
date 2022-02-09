@@ -29,9 +29,22 @@ func (cj CongressmanJsonEncoder) SetHeader() {
 }
 
 func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
-	return models.EntityModel{}
+	var entityResult models.EntityModel
+	var congressman models.CongressmanModel
+
+	errJson := json.Unmarshal(body, &congressman)
+
+	if errJson != nil {
+		cj.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog(errJson.Error())
+	}
+	entityResult.Congressman = congressman
+	return entityResult
 }
 
 func (cj CongressmanJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-
+	congressman := model.Congressman
+	congressman.Id = lid
+	cj.WriteHeader(http.StatusCreated)
+	cj.EncodeEntity(model)
 }
