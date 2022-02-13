@@ -202,6 +202,11 @@ func (mr *MandateRepository) UpdateMandate(mandate *models.MandateModel, id int)
 	return noError
 }
 
+func (mr MandateRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	noError := mr.UpdateMandate(&entity.Mandate, id)
+	return noError
+}
+
 func (mr *MandateRepository) DeleteMandate(id int) (int64, bool) {
 	var nbDelete int64
 	db := mr.InitDB()

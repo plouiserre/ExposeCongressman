@@ -1,8 +1,6 @@
 package Controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -43,43 +41,12 @@ func CreateMandate(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitMandateRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitMandateRepository()
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		mandate, noError := repo.GetMandate(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if mandate == nil {
-			w.WriteHeader(http.StatusNotFound)
-			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
-		} else {
-			body, errBody := ioutil.ReadAll(r.Body)
-			if errBody != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				logManager.WriteErrorLog(err.Error())
-			} else {
-				errJson := json.Unmarshal(body, &mandate)
-				if errJson != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					logManager.WriteErrorLog(err.Error())
-				} else {
-					noError := repo.UpdateMandate(mandate, id)
-					if !noError {
-						w.WriteHeader(http.StatusInternalServerError)
-					} else {
-						w.WriteHeader(http.StatusOK)
-						json.NewEncoder(w).Encode(mandate)
-					}
-				}
-			}
-		}
+	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
+		W: w,
 	}
+	UpdateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {

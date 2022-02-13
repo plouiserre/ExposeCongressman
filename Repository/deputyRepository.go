@@ -188,6 +188,10 @@ func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) boo
 	return noError
 }
 
+func (dr DeputyRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	return false
+}
+
 func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {
 	var nbDelete int64
 	db := dr.InitDB()

@@ -10,6 +10,6 @@ type IJsonEncoder interface {
 	EncodeEntities(models models.EntityModel)
 	EncodeEntity(model models.EntityModel)
 	SetHeader()
-	UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel
+	UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool)
 	ResponseEntityCreated(model models.EntityModel, lid int64)
 }

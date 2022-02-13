@@ -28,18 +28,21 @@ func (cj CongressmanJsonEncoder) SetHeader() {
 	cj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
 }
 
-func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
+func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool) {
 	var entityResult models.EntityModel
 	var congressman models.CongressmanModel
+
+	noError := true
 
 	errJson := json.Unmarshal(body, &congressman)
 
 	if errJson != nil {
 		cj.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog(errJson.Error())
+		noError = false
 	}
 	entityResult.Congressman = congressman
-	return entityResult
+	return entityResult, noError
 }
 
 func (cj CongressmanJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {

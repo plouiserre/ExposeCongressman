@@ -28,18 +28,21 @@ func (dj DeputyJsonEncoder) SetHeader() {
 	dj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
 }
 
-func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
+func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool) {
 	var deputy models.DeputyModel
 	var entityResult models.EntityModel
+
+	noError := true
 
 	errJson := json.Unmarshal(body, &deputy)
 
 	if errJson != nil {
 		dj.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog(errJson.Error())
+		noError = false
 	}
 	entityResult.Deputy = deputy
-	return entityResult
+	return entityResult, noError
 }
 
 func (dj DeputyJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {

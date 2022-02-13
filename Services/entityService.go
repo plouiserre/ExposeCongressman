@@ -59,3 +59,9 @@ func (entityService EntityService) CreateEntity(repo repository.IRepository, ent
 
 	return lid, noError
 }
+
+func (entityService EntityService) UpdateEntity(repo repository.IRepository, entity *models.EntityModel, id int) bool {
+	noError := repo.UpdateEntity(entity, id)
+
+	return noError
+}

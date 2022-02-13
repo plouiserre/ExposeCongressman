@@ -28,19 +28,22 @@ func (mj MandateJsonEncoder) SetHeader() {
 	mj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
 }
 
-func (mj MandateJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) models.EntityModel {
+func (mj MandateJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool) {
 	var mandate models.MandateModel
 	var entityResult models.EntityModel
+
+	noError := true
 
 	errJson := json.Unmarshal(body, &mandate)
 
 	if errJson != nil {
 		mj.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog(errJson.Error())
+		noError = false
 	}
 
 	entityResult.Mandate = mandate
-	return entityResult
+	return entityResult, noError
 }
 
 func (mj MandateJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {

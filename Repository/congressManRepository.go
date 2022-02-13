@@ -202,6 +202,10 @@ func (cr *CongressmanRepository) UpdateCongressMan(congressman *models.Congressm
 	return noError
 }
 
+func (cr CongressmanRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	return false
+}
+
 func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
 	var nbDelete int64
 	db := cr.InitDB()
