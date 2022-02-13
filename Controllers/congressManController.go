@@ -1,8 +1,6 @@
 package Controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -44,43 +42,13 @@ func CreateCongressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitCongressmanRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitCongressmanRepository()
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		congressman, noError := repo.GetCongressman(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if congressman == nil {
-			w.WriteHeader(http.StatusNotFound)
-			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
-		} else {
-			body, errBody := ioutil.ReadAll(r.Body)
-			if errBody != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				logManager.WriteErrorLog(err.Error())
-			} else {
-				errJson := json.Unmarshal(body, &congressman)
-				if errJson != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					logManager.WriteErrorLog(err.Error())
-				} else {
-					noError := repo.UpdateCongressMan(congressman, id)
-					if !noError {
-						w.WriteHeader(http.StatusInternalServerError)
-					} else {
-						w.WriteHeader(http.StatusOK)
-						json.NewEncoder(w).Encode(congressman)
-					}
-				}
-			}
-		}
+	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
+		W: w,
 	}
+
+	UpdateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {

@@ -203,7 +203,8 @@ func (cr *CongressmanRepository) UpdateCongressMan(congressman *models.Congressm
 }
 
 func (cr CongressmanRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
-	return false
+	noError := cr.UpdateCongressMan(&entity.Congressman, id)
+	return noError
 }
 
 func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
