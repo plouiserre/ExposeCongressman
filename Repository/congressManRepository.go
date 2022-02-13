@@ -231,7 +231,8 @@ func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
 }
 
 func (cr CongressmanRepository) DeleteEntity(id int) (int64, bool) {
-	return 0, false
+	nbDelete, noError := cr.DeleteCongressMan(id)
+	return nbDelete, noError
 }
 
 func (cr CongressmanRepository) InitRepository() (IRepository, Manager.LogManager) {

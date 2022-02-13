@@ -2,9 +2,7 @@ package Controllers
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	repository "github.com/plouiserre/exposecongressman/Repository"
@@ -52,26 +50,13 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitCongressmanRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitCongressmanRepository()
 
-	vars := mux.Vars(r)
-
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		nbDelete, noError := repo.DeleteCongressMan(id)
-
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if nbDelete > 0 {
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
+	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
+		W: w,
 	}
+
+	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
