@@ -189,7 +189,8 @@ func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) boo
 }
 
 func (dr DeputyRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
-	return false
+	noError := dr.UpdateDeputy(&entity.Deputy, id)
+	return noError
 }
 
 func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {

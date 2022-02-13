@@ -1,8 +1,6 @@
 package Controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -44,43 +42,13 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitDeputyRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitDeputyRepository()
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		deputy, noError := repo.GetDeputy(id)
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if deputy == nil {
-			w.WriteHeader(http.StatusNotFound)
-			logManager.WriteErrorLog("No Deputy find with this id " + vars["id"])
-		} else {
-			body, errBody := ioutil.ReadAll(r.Body)
-			if errBody != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				logManager.WriteErrorLog(err.Error())
-			} else {
-				errJson := json.Unmarshal(body, &deputy)
-				if errJson != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					logManager.WriteErrorLog(err.Error())
-				} else {
-					noError := repo.UpdateDeputy(deputy, id)
-					if !noError {
-						w.WriteHeader(http.StatusInternalServerError)
-					} else {
-						w.WriteHeader(http.StatusOK)
-						json.NewEncoder(w).Encode(deputy)
-					}
-				}
-			}
-		}
+	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
+		W: w,
 	}
+
+	UpdateEntity(deputyJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
