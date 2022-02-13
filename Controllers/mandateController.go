@@ -2,9 +2,7 @@ package Controllers
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	repository "github.com/plouiserre/exposecongressman/Repository"
@@ -50,7 +48,7 @@ func UpdateMandate(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitMandateRepository()
+	/*repo, logManager := InitMandateRepository()
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 
 	vars := mux.Vars(r)
@@ -69,7 +67,13 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
+	}*/
+	repo, _ := InitMandateRepository()
+
+	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
+		W: w,
 	}
+	DeleteEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {

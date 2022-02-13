@@ -117,3 +117,27 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 		}
 	}
 }
+
+func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
+	jsonEncoder.SetHeader()
+
+	entityService := services.EntityService{}
+
+	vars := mux.Vars(r)
+
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		jsonEncoder.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error Body " + err.Error())
+	} else {
+		nbDelete, noError := entityService.DeleteEntity(repo, id)
+
+		if !noError {
+			jsonEncoder.WriteHeader(http.StatusInternalServerError)
+		} else if nbDelete > 0 {
+			jsonEncoder.WriteHeader(http.StatusNoContent)
+		} else {
+			jsonEncoder.WriteHeader(http.StatusNotFound)
+		}
+	}
+}

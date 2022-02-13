@@ -230,6 +230,11 @@ func (mr *MandateRepository) DeleteMandate(id int) (int64, bool) {
 	return nbDelete, noError
 }
 
+func (mr MandateRepository) DeleteEntity(id int) (int64, bool) {
+	nbDelete, noError := mr.DeleteMandate(id)
+	return nbDelete, noError
+}
+
 func (mr MandateRepository) InitRepository() (IRepository, Manager.LogManager) {
 	return nil, manager.LogManager{}
 }

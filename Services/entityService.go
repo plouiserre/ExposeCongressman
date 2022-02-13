@@ -65,3 +65,9 @@ func (entityService EntityService) UpdateEntity(repo repository.IRepository, ent
 
 	return noError
 }
+
+func (entityService EntityService) DeleteEntity(repo repository.IRepository, id int) (int64, bool) {
+	nbDelete, noError := repo.DeleteEntity(id)
+
+	return nbDelete, noError
+}
