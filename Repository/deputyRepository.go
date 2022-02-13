@@ -217,7 +217,8 @@ func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {
 }
 
 func (dr DeputyRepository) DeleteEntity(id int) (int64, bool) {
-	return 0, false
+	nbDelete, noError := dr.DeleteDeputy(id)
+	return nbDelete, noError
 }
 
 func (dr DeputyRepository) InitRepository() (IRepository, Manager.LogManager) {

@@ -2,9 +2,7 @@ package Controllers
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	repository "github.com/plouiserre/exposecongressman/Repository"
@@ -52,26 +50,13 @@ func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, logManager := InitDeputyRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	repo, _ := InitDeputyRepository()
 
-	vars := mux.Vars(r)
-
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		nbDelete, noError := repo.DeleteDeputy(id)
-
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if nbDelete > 0 {
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
+	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
+		W: w,
 	}
+
+	DeleteEntity(deputyJsonEncoder, r, repo, *repo.LogManager)
 }
 
 func InitDeputyRepository() (repository.DeputyRepository, Manager.LogManager) {
