@@ -2,6 +2,8 @@ package Models
 
 import (
 	"database/sql"
+
+	manager "github.com/plouiserre/exposecongressman/Manager"
 )
 
 type DeputyModel struct {
@@ -13,3 +15,11 @@ type DeputyModel struct {
 }
 
 type DeputiesModel []DeputyModel
+
+func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
+	return nil, nil
+}
+
+func (dms DeputiesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	return EntityModel{}, false
+}

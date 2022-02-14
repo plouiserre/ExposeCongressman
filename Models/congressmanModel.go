@@ -1,5 +1,11 @@
 package Models
 
+import (
+	"database/sql"
+
+	manager "github.com/plouiserre/exposecongressman/Manager"
+)
+
 type CongressmanModel struct {
 	Id              int64  `json:"Id"`
 	Uid             string `json:"Uid"`
@@ -18,3 +24,11 @@ type CongressmanModel struct {
 }
 
 type CongressmansModel []CongressmanModel
+
+func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
+	return nil, nil
+}
+
+func (cms CongressmansModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	return EntityModel{}, false
+}

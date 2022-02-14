@@ -16,6 +16,8 @@ const (
 
 type EntityService struct {
 	Entity
+	Models models.IModels
+	repo   repository.RepositoryBase
 }
 
 func (entityService *EntityService) InitRepository(entityType int) (repository.IRepository, Manager.LogManager) {
@@ -42,8 +44,8 @@ func (entityService *EntityService) InitRepository(entityType int) (repository.I
 	}
 }
 
-func (entityService EntityService) GetAll(repo repository.IRepository) (*models.EntityModel, bool) {
-	entities, noError := repo.GetAll()
+func (entityService EntityService) GetAll() (*models.EntityModel, bool) {
+	entities, noError := entityService.repo.GetAll(entityService.Models)
 
 	return entities, noError
 }

@@ -5,6 +5,7 @@ import (
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
+	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
@@ -16,7 +17,9 @@ func Deputies(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetAll(deputyJsonEncoder, r, repo)
+	deputies := models.DeputiesModel{}
+
+	GetAll(deputyJsonEncoder, r, repo, deputies)
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {

@@ -5,6 +5,7 @@ import (
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
+	models "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
@@ -16,7 +17,9 @@ func Congressmans(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetAll(congressmanJsonEncoder, r, repo)
+	congressmans := models.CongressmansModel{}
+
+	GetAll(congressmanJsonEncoder, r, repo, congressmans)
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {

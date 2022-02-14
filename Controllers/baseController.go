@@ -8,18 +8,21 @@ import (
 	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
+	model "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 //TODO mettre moins de paramètre dans ses méthodes
-
-func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository) {
+//TODO créer une struct que j'appelerai basecontroller pour éviter de passer à chaque fois tous ses paramètres
+func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, modelsEntities model.IModels) {
 	jsonEncoder.SetHeader()
 
-	entityService := services.EntityService{}
+	entityService := services.EntityService{
+		Models: modelsEntities,
+	}
 
-	entities, noError := entityService.GetAll(repo)
+	entities, noError := entityService.GetAll()
 
 	if noError {
 		jsonEncoder.WriteHeader(http.StatusOK)
@@ -29,7 +32,6 @@ func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposito
 	}
 }
 
-//TODO optimiser les paramètres de la méthode et de entityService
 func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, entityName string, logManager Manager.LogManager) {
 	jsonEncoder.SetHeader()
 

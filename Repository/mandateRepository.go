@@ -29,38 +29,6 @@ func (mr MandateRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-/*func (mr *MandateRepository) AllMandates() (*models.MandatesModel, bool) {
-	var mandates models.MandatesModel
-	db := mr.InitDB()
-	noError := true
-
-	rows, err := db.Query("select * FROM PROCESSDEPUTES.Mandate;")
-
-	if err != nil {
-		mr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
-		noError = false
-	} else {
-		defer rows.Close()
-
-		for rows.Next() {
-			var mandate models.MandateModel
-			err := rows.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
-				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNoming,
-				&mandate.QualityCode, &mandate.QualityLabel, &mandate.QualityLabelSex,
-				&mandate.RefBody, &mandate.CongressmanId)
-
-			if err != nil {
-				mr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
-				noError = false
-			}
-
-			mandates = append(mandates, mandate)
-		}
-	}
-
-	return &mandates, noError
-}*/
-
 //TODO quand ca marchera redéplacer tout le code de AllMandates dans GetAll()
 func (mr MandateRepository) GetAll() (*models.EntityModel, bool) {
 	var mandates models.MandatesModel
