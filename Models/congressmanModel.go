@@ -26,9 +26,29 @@ type CongressmanModel struct {
 type CongressmansModel []CongressmanModel
 
 func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
-	return nil, nil
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan;")
+	return rows, err
 }
 
 func (cms CongressmansModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
-	return EntityModel{}, false
+	var congressmans CongressmansModel
+	var entities EntityModel
+	noError := true
+
+	for rows.Next() {
+		var congressman CongressmanModel
+		err := rows.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+			&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+			&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+			&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+
+		if err != nil {
+			logManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+			noError = false
+		}
+
+		congressmans = append(congressmans, congressman)
+	}
+	entities.Congressmans = congressmans
+	return entities, noError
 }
