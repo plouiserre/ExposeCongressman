@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/plouiserre/exposecongressman/Manager"
 	manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
@@ -12,7 +13,7 @@ type DeputyRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (dr *DeputyRepository) InitDB() (db *sql.DB) {
+func (dr DeputyRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {
@@ -26,7 +27,7 @@ func (dr *DeputyRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
+/*func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	var deputies models.DeputiesModel
 	db := dr.InitDB()
 	noError := true
@@ -53,8 +54,40 @@ func (dr *DeputyRepository) AllDeputies() (*models.DeputiesModel, bool) {
 	}
 
 	return &deputies, noError
+}*/
+
+func (dr DeputyRepository) GetAll() (*models.EntityModel, bool) {
+	var deputies models.DeputiesModel
+	var entities models.EntityModel
+	db := dr.InitDB()
+	noError := true
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.Deputy;")
+
+	if err != nil {
+		dr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var deputy models.DeputyModel
+			err := rows.Scan(&deputy.Id, &deputy.StartDate, &deputy.EndDate, &deputy.RefDeputy, &deputy.MandateId)
+
+			if err != nil {
+				dr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
+
+			deputies = append(deputies, deputy)
+		}
+		entities.Deputies = deputies
+	}
+
+	return &entities, noError
 }
 
+//TODO à supprimer quand l'update du controller sera fait
 func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 	var deputy models.DeputyModel
 	db := dr.InitDB()
@@ -76,8 +109,22 @@ func (dr *DeputyRepository) GetDeputy(id int) (*models.DeputyModel, bool) {
 		}
 		row.Close()
 	}
+
 	if deputy != (models.DeputyModel{}) {
 		return &deputy, noError
+	} else {
+		return nil, noError
+	}
+}
+
+func (dr DeputyRepository) GetById(id int) (*models.EntityModel, bool) {
+	var entity models.EntityModel
+
+	deputy, noError := dr.GetDeputy(id)
+
+	if deputy != nil {
+		entity.Deputy = *deputy
+		return &entity, noError
 	} else {
 		return nil, noError
 	}
@@ -115,6 +162,11 @@ func (dr *DeputyRepository) InsertDeputy(deputy *models.DeputyModel) (int64, boo
 	return lid, noError
 }
 
+func (dr DeputyRepository) CreateEntity(entity *models.EntityModel) (int64, bool) {
+	lid, noError := dr.InsertDeputy(&entity.Deputy)
+	return lid, noError
+}
+
 func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) bool {
 	db := dr.InitDB()
 	noError := true
@@ -133,6 +185,11 @@ func (dr *DeputyRepository) UpdateDeputy(deputy *models.DeputyModel, id int) boo
 	}
 
 	defer db.Close()
+	return noError
+}
+
+func (dr DeputyRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	noError := dr.UpdateDeputy(&entity.Deputy, id)
 	return noError
 }
 
@@ -157,4 +214,13 @@ func (dr *DeputyRepository) DeleteDeputy(id int) (int64, bool) {
 	defer db.Close()
 
 	return nbDelete, noError
+}
+
+func (dr DeputyRepository) DeleteEntity(id int) (int64, bool) {
+	nbDelete, noError := dr.DeleteDeputy(id)
+	return nbDelete, noError
+}
+
+func (dr DeputyRepository) InitRepository() (IRepository, Manager.LogManager) {
+	return nil, manager.LogManager{}
 }

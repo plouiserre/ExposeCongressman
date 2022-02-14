@@ -5,6 +5,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/plouiserre/exposecongressman/Manager"
 	manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
@@ -13,7 +14,7 @@ type CongressmanRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (cr *CongressmanRepository) InitDB() (db *sql.DB) {
+func (cr CongressmanRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {
@@ -27,7 +28,7 @@ func (cr *CongressmanRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, bool) {
+/*func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, bool) {
 	var congressMans models.CongressmansModel
 	db := cr.InitDB()
 	noError := true
@@ -57,9 +58,43 @@ func (cr *CongressmanRepository) AllCongressMans() (*models.CongressmansModel, b
 	}
 
 	return &congressMans, noError
+}*/
+
+func (cr CongressmanRepository) GetAll() (*models.EntityModel, bool) {
+	var congressmans models.CongressmansModel
+	var entities models.EntityModel
+	db := cr.InitDB()
+	noError := true
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan;")
+
+	if err != nil {
+		cr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var congressman models.CongressmanModel
+			err := rows.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+				&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+				&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+				&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+
+			if err != nil {
+				cr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
+
+			congressmans = append(congressmans, congressman)
+		}
+		entities.Congressmans = congressmans
+	}
+
+	return &entities, noError
 }
 
-func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanModel, bool) {
+func (cr *CongressmanRepository) GetCongressman(id int) (*models.CongressmanModel, bool) {
 	var congressman models.CongressmanModel
 	db := cr.InitDB()
 	noError := true
@@ -85,6 +120,19 @@ func (cr *CongressmanRepository) GetCongressMan(id int) (*models.CongressmanMode
 	}
 	if congressman != (models.CongressmanModel{}) {
 		return &congressman, noError
+	} else {
+		return nil, noError
+	}
+}
+
+func (cr CongressmanRepository) GetById(id int) (*models.EntityModel, bool) {
+	var entity models.EntityModel
+
+	congressman, noError := cr.GetCongressman(id)
+
+	if congressman != nil {
+		entity.Congressman = *congressman
+		return &entity, noError
 	} else {
 		return nil, noError
 	}
@@ -125,6 +173,11 @@ func (cr *CongressmanRepository) InsertCongressMan(congressman *models.Congressm
 	return lid, noError
 }
 
+func (cr CongressmanRepository) CreateEntity(entity *models.EntityModel) (int64, bool) {
+	lid, noError := cr.InsertCongressMan(&entity.Congressman)
+	return lid, noError
+}
+
 func (cr *CongressmanRepository) UpdateCongressMan(congressman *models.CongressmanModel, id int) bool {
 	db := cr.InitDB()
 	noError := true
@@ -149,6 +202,11 @@ func (cr *CongressmanRepository) UpdateCongressMan(congressman *models.Congressm
 	return noError
 }
 
+func (cr CongressmanRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	noError := cr.UpdateCongressMan(&entity.Congressman, id)
+	return noError
+}
+
 func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
 	var nbDelete int64
 	db := cr.InitDB()
@@ -170,4 +228,13 @@ func (cr *CongressmanRepository) DeleteCongressMan(id int) (int64, bool) {
 	defer db.Close()
 
 	return nbDelete, noError
+}
+
+func (cr CongressmanRepository) DeleteEntity(id int) (int64, bool) {
+	nbDelete, noError := cr.DeleteCongressMan(id)
+	return nbDelete, noError
+}
+
+func (cr CongressmanRepository) InitRepository() (IRepository, Manager.LogManager) {
+	return nil, manager.LogManager{}
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/plouiserre/exposecongressman/Manager"
 	manager "github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
@@ -14,7 +15,7 @@ type MandateRepository struct {
 }
 
 //TODO factoriser avec les autres repository
-func (mr *MandateRepository) InitDB() (db *sql.DB) {
+func (mr MandateRepository) InitDB() (db *sql.DB) {
 	db, err := sql.Open("mysql", "ProcessDeputesData:ASimpleP@ssW0rd@/PROCESSDEPUTES")
 
 	if err != nil {
@@ -28,7 +29,7 @@ func (mr *MandateRepository) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (mr *MandateRepository) AllMandates() (*models.MandatesModel, bool) {
+/*func (mr *MandateRepository) AllMandates() (*models.MandatesModel, bool) {
 	var mandates models.MandatesModel
 	db := mr.InitDB()
 	noError := true
@@ -58,6 +59,41 @@ func (mr *MandateRepository) AllMandates() (*models.MandatesModel, bool) {
 	}
 
 	return &mandates, noError
+}*/
+
+//TODO quand ca marchera redéplacer tout le code de AllMandates dans GetAll()
+func (mr MandateRepository) GetAll() (*models.EntityModel, bool) {
+	var mandates models.MandatesModel
+	var entities models.EntityModel
+	db := mr.InitDB()
+	noError := true
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.Mandate;")
+
+	if err != nil {
+		mr.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var mandate models.MandateModel
+			err := rows.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
+				&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNoming,
+				&mandate.QualityCode, &mandate.QualityLabel, &mandate.QualityLabelSex,
+				&mandate.RefBody, &mandate.CongressmanId)
+
+			if err != nil {
+				mr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+				noError = false
+			}
+
+			mandates = append(mandates, mandate)
+		}
+		entities.Mandates = mandates
+	}
+
+	return &entities, noError
 }
 
 func (mr *MandateRepository) GetMandate(id int) (*models.MandateModel, bool) {
@@ -86,6 +122,18 @@ func (mr *MandateRepository) GetMandate(id int) (*models.MandateModel, bool) {
 	}
 	if mandate != (models.MandateModel{}) {
 		return &mandate, noError
+	} else {
+		return nil, noError
+	}
+}
+
+func (mr MandateRepository) GetById(id int) (*models.EntityModel, bool) {
+	var entity models.EntityModel
+
+	mandate, noError := mr.GetMandate(id)
+	if mandate != nil {
+		entity.Mandate = *mandate
+		return &entity, noError
 	} else {
 		return nil, noError
 	}
@@ -125,6 +173,12 @@ func (mr *MandateRepository) InsertMandate(mandate *models.MandateModel) (int64,
 	return lid, noError
 }
 
+func (mr MandateRepository) CreateEntity(entity *models.EntityModel) (int64, bool) {
+	lid, noError := mr.InsertMandate(&entity.Mandate)
+
+	return lid, noError
+}
+
 func (mr *MandateRepository) UpdateMandate(mandate *models.MandateModel, id int) bool {
 	db := mr.InitDB()
 	noError := true
@@ -145,6 +199,11 @@ func (mr *MandateRepository) UpdateMandate(mandate *models.MandateModel, id int)
 	}
 
 	defer db.Close()
+	return noError
+}
+
+func (mr MandateRepository) UpdateEntity(entity *models.EntityModel, id int) bool {
+	noError := mr.UpdateMandate(&entity.Mandate, id)
 	return noError
 }
 
@@ -169,4 +228,13 @@ func (mr *MandateRepository) DeleteMandate(id int) (int64, bool) {
 	defer db.Close()
 
 	return nbDelete, noError
+}
+
+func (mr MandateRepository) DeleteEntity(id int) (int64, bool) {
+	nbDelete, noError := mr.DeleteMandate(id)
+	return nbDelete, noError
+}
+
+func (mr MandateRepository) InitRepository() (IRepository, Manager.LogManager) {
+	return nil, manager.LogManager{}
 }
