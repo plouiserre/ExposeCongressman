@@ -17,9 +17,26 @@ type DeputyModel struct {
 type DeputiesModel []DeputyModel
 
 func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
-	return nil, nil
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.Deputy;")
+	return rows, err
 }
 
 func (dms DeputiesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
-	return EntityModel{}, false
+	var deputies DeputiesModel
+	var entities EntityModel
+	noError := true
+
+	for rows.Next() {
+		var deputy DeputyModel
+		err := rows.Scan(&deputy.Id, &deputy.StartDate, &deputy.EndDate, &deputy.RefDeputy, &deputy.MandateId)
+
+		if err != nil {
+			logManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+			noError = false
+		}
+
+		deputies = append(deputies, deputy)
+	}
+	entities.Deputies = deputies
+	return entities, noError
 }
