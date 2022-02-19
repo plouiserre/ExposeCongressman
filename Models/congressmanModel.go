@@ -23,6 +23,13 @@ type CongressmanModel struct {
 	FamSocPro       string `json:"FamSocPro"`
 }
 
+func (cm CongressmanModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
+	return nil, nil
+}
+func (cm CongressmanModel) RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	return EntityModel{}, false
+}
+
 type CongressmansModel []CongressmanModel
 
 func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

@@ -29,7 +29,9 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetById(deputyJsonEncoder, r, repo, "deputy", *repo.LogManager)
+	deputy := models.DeputyModel{}
+
+	GetById(deputyJsonEncoder, r, repo, "deputy", *repo.LogManager, deputy)
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {

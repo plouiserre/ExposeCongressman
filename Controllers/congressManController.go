@@ -29,7 +29,9 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	GetById(congressmanJsonEncoder, r, repo, "congressman", *repo.LogManager)
+	congressman := models.CongressmanModel{}
+
+	GetById(congressmanJsonEncoder, r, repo, "congressman", *repo.LogManager, congressman)
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {

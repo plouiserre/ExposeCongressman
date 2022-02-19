@@ -46,8 +46,30 @@ func (rb RepositoryBase) GetAll(model models.IModels) (*models.EntityModel, bool
 	return &entities, noError
 }
 
-func (rb RepositoryBase) GetById(id int) (*models.EntityModel, bool) {
-	return nil, false
+func (rb RepositoryBase) GetById(model models.IGetByIdEntity, id int) (*models.EntityModel, bool) {
+	var entity models.EntityModel
+	db := rb.InitDB()
+	noError := true
+	isEmpty := false
+
+	row, err := model.QueryGetById(db, id)
+
+	if err != nil {
+		rb.LogManager.WriteErrorLog("Erreur requête " + err.Error())
+		noError = false
+	} else {
+		if row.Next() {
+			entity, noError = model.RowsScanGetById(row, rb.LogManager)
+		} else {
+			isEmpty = true
+		}
+		row.Close()
+	}
+	if !isEmpty {
+		return &entity, noError
+	} else {
+		return nil, noError
+	}
 }
 
 func (rb RepositoryBase) CreateEntity(entity *models.EntityModel) (int64, bool) {

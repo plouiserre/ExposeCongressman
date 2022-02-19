@@ -17,7 +17,9 @@ const (
 type EntityService struct {
 	Entity
 	Models models.IModels
-	repo   repository.RepositoryBase
+	//TODO trouver un autre nom
+	GetByIdEntity models.IGetByIdEntity
+	repo          repository.RepositoryBase
 }
 
 func (entityService *EntityService) InitRepository(entityType int) (repository.IRepository, Manager.LogManager) {
@@ -50,8 +52,12 @@ func (entityService EntityService) GetAll() (*models.EntityModel, bool) {
 	return entities, noError
 }
 
-func (entityService EntityService) GetById(id int, repo repository.IRepository) (*models.EntityModel, bool) {
-	entity, noError := repo.GetById(id)
+func (entityService EntityService) GetById(id int) (*models.EntityModel, bool) {
+	/*entity, noError := repo.GetById(id)
+
+	return entity, noError*/
+
+	entity, noError := entityService.repo.GetById(entityService.GetByIdEntity, id)
 
 	return entity, noError
 }

@@ -6,6 +6,8 @@ import (
 	manager "github.com/plouiserre/exposecongressman/Manager"
 )
 
+//séparer en plusieurs fichiers
+
 type MandateModel struct {
 	Id              int64          `json:"Id"`
 	Uid             string         `json:"Uid"`
@@ -20,6 +22,30 @@ type MandateModel struct {
 	QualityLabelSex string         `json:"QualityLabelSex"`
 	RefBody         sql.NullString `json:"RefBody"`
 	CongressmanId   string         `json:"CongressmanId"`
+}
+
+func (mm MandateModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
+	row, err := db.Query("select * FROM PROCESSDEPUTES.Mandate where MandateId=?;", id)
+	return row, err
+}
+
+func (mm MandateModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	var mandate MandateModel
+	var entity EntityModel
+	noError := true
+
+	errScan := row.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
+		&mandate.StartDate, &mandate.EndDate, &mandate.Precedence, &mandate.PrincipleNoming,
+		&mandate.QualityCode, &mandate.QualityLabel, &mandate.QualityLabelSex,
+		&mandate.RefBody, &mandate.CongressmanId)
+
+	if errScan != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errScan.Error())
+		noError = false
+
+	}
+	entity.Mandate = mandate
+	return entity, noError
 }
 
 type MandatesModel []MandateModel

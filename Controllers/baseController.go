@@ -32,10 +32,12 @@ func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposito
 	}
 }
 
-func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, entityName string, logManager Manager.LogManager) {
+func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, entityName string, logManager Manager.LogManager, getByIdEntity model.IGetByIdEntity) {
 	jsonEncoder.SetHeader()
 
-	entityService := services.EntityService{}
+	entityService := services.EntityService{
+		GetByIdEntity: getByIdEntity,
+	}
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -44,7 +46,7 @@ func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposit
 		jsonEncoder.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog("Error cast " + err.Error())
 	} else {
-		entity, noError := entityService.GetById(id, repo)
+		entity, noError := entityService.GetById(id)
 		if !noError {
 			jsonEncoder.WriteHeader(http.StatusInternalServerError)
 			logManager.WriteErrorLog("Error during the recovery of the entity")
@@ -93,7 +95,7 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 		jsonEncoder.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		entity, noError := entityService.GetById(id, repo)
+		entity, noError := entityService.GetById(id)
 		if !noError {
 			jsonEncoder.WriteHeader(http.StatusInternalServerError)
 		} else if entity == nil {

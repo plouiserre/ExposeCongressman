@@ -14,6 +14,13 @@ type DeputyModel struct {
 	MandateId int64          `json:"MandateId"`
 }
 
+func (dm DeputyModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
+	return nil, nil
+}
+func (dm DeputyModel) RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	return EntityModel{}, false
+}
+
 type DeputiesModel []DeputyModel
 
 func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
