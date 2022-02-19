@@ -15,10 +15,21 @@ type DeputyModel struct {
 }
 
 func (dm DeputyModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
-	return nil, nil
+	row, err := db.Query("select * FROM PROCESSDEPUTES.Deputy where DeputyId=?;", id)
+	return row, err
 }
-func (dm DeputyModel) RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
-	return EntityModel{}, false
+func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	var deputy DeputyModel
+	var entity EntityModel
+	noError := true
+	errScan := row.Scan(&deputy.Id, &deputy.StartDate, &deputy.EndDate, &deputy.RefDeputy, &deputy.MandateId)
+
+	if errScan != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errScan.Error())
+		noError = false
+	}
+	entity.Deputy = deputy
+	return entity, noError
 }
 
 type DeputiesModel []DeputyModel
