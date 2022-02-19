@@ -24,10 +24,26 @@ type CongressmanModel struct {
 }
 
 func (cm CongressmanModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
-	return nil, nil
+	row, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan where CongressManId=?;", id)
+	return row, err
 }
-func (cm CongressmanModel) RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
-	return EntityModel{}, false
+
+func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+	var congressman CongressmanModel
+	var entity EntityModel
+	noError := true
+
+	errScan := row.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
+		&congressman.LastName, &congressman.Alpha, &congressman.Trigramme, &congressman.BirthDate,
+		&congressman.BirthCity, &congressman.BirthDepartment, &congressman.BirthCountry,
+		&congressman.Jobtitle, &congressman.CatSocPro, &congressman.FamSocPro)
+
+	if errScan != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errScan.Error())
+		noError = false
+	}
+	entity.Congressman = congressman
+	return entity, noError
 }
 
 type CongressmansModel []CongressmanModel
