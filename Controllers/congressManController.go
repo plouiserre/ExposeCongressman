@@ -51,9 +51,9 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	//congressman := models.CongressmanModel{}
+	congressman := models.CongressmanModel{}
 
-	UpdateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, nil, nil)
+	UpdateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, congressman, congressman)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {

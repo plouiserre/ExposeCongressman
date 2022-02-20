@@ -12,6 +12,7 @@ type IModels interface {
 	RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool)
 }
 
+//TODO fusionner IGetByIdEntity ICreateEntity IUpdateEntity et IDeleteEntity dans une seule interface
 type IGetByIdEntity interface {
 	QueryGetById(db *sql.DB, id int) (*sql.Rows, error)
 	RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool)
