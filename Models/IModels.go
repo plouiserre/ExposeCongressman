@@ -22,3 +22,8 @@ type ICreateEntity interface {
 	PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool)
 	ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error)
 }
+
+type IUpdateEntity interface {
+	PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool)
+	ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error)
+}

@@ -76,6 +76,25 @@ func (mm MandateModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sq
 	return res, "Mandate ", errExec
 }
 
+func (mm MandateModel) PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryMandate := "UPDATE  PROCESSDEPUTES.Mandate SET MandateUid=?, TermOffice=?, TypeOrgane=?,StartDate=?, EndDate=?, Precedence=?, PrincipleNoming=?, QualityCode=?, QualityLabel=?, QualityLabelSex=?, RefBody=?, CongressManId=? WHERE MandateId = ?"
+	stmt, errPrepare := db.Prepare(queryMandate)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
+func (mm MandateModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error) {
+	mandate := model.Mandate
+	_, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate,
+		mandate.EndDate, mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel,
+		mandate.QualityLabelSex, mandate.RefBody, mandate.CongressmanId, id)
+	return "Mandate ", errExec
+}
+
 type MandatesModel []MandateModel
 
 func (mms MandatesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

@@ -101,8 +101,21 @@ func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models
 	return lid, noError
 }
 
-func (rb RepositoryBase) UpdateEntity(entity *models.EntityModel, id int) bool {
-	return false
+func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models.EntityModel, id int) bool {
+	db := rb.InitDB()
+	noError := true
+
+	stmt, noError := model.PrepareUpdateQuery(db, rb.LogManager)
+	if noError {
+		nameRepository, errExec := model.ExecuteUpdateQuery(stmt, *entity, id)
+		if errExec != nil {
+			rb.LogManager.WriteErrorLog(nameRepository + "Repository : Erreur exécution requête " + errExec.Error())
+			noError = false
+		}
+	}
+
+	defer db.Close()
+	return noError
 }
 
 func (rb RepositoryBase) DeleteEntity(id int) (int64, bool) {

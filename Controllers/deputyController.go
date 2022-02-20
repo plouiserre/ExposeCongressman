@@ -51,7 +51,9 @@ func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	UpdateEntity(deputyJsonEncoder, r, repo, *repo.LogManager)
+	//deputy := models.DeputyModel{}
+
+	UpdateEntity(deputyJsonEncoder, r, repo, *repo.LogManager, nil, nil)
 }
 
 func DeleteDeputy(w http.ResponseWriter, r *http.Request) {

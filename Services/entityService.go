@@ -20,6 +20,7 @@ type EntityService struct {
 	//TODO trouver un autre nom
 	IGetByIdEntity models.IGetByIdEntity
 	ICreateEntity  models.ICreateEntity
+	IUpdateEntity  models.IUpdateEntity
 	RepositoryBase repository.RepositoryBase
 }
 
@@ -66,8 +67,8 @@ func (entityService EntityService) CreateEntity(entity *models.EntityModel) (int
 	return lid, noError
 }
 
-func (entityService EntityService) UpdateEntity(repo repository.IRepository, entity *models.EntityModel, id int) bool {
-	noError := repo.UpdateEntity(entity, id)
+func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id int) bool {
+	noError := entityService.RepositoryBase.UpdateEntity(entityService.IUpdateEntity, entity, id)
 
 	return noError
 }

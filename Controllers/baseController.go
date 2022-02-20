@@ -91,10 +91,15 @@ func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 	}
 }
 
-func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
-	jsonEncoder.SetHeader()
+//TODO retravailler les paramètres
+func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager, updateEntity model.IUpdateEntity, getByIdEntity model.IGetByIdEntity) {
+	repositoryBase := InitBaseController(jsonEncoder)
 
-	entityService := services.EntityService{}
+	entityService := services.EntityService{
+		IUpdateEntity:  updateEntity,
+		IGetByIdEntity: getByIdEntity,
+		RepositoryBase: repositoryBase,
+	}
 
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -116,7 +121,7 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 			} else {
 				entity, noErrorMarhsal := jsonEncoder.UnmarshalEntity(body, logManager)
 				if noErrorMarhsal {
-					noError := entityService.UpdateEntity(repo, &entity, id)
+					noError := entityService.UpdateEntity(&entity, id)
 					if !noError {
 						jsonEncoder.WriteHeader(http.StatusInternalServerError)
 					} else {

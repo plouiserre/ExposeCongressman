@@ -50,7 +50,11 @@ func UpdateMandate(w http.ResponseWriter, r *http.Request) {
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	UpdateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
+
+	mandate := models.MandateModel{}
+
+	//TODO changer ca car troooooop moche
+	UpdateEntity(MandateJsonEncoder, r, repo, *repo.LogManager, mandate, mandate)
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
