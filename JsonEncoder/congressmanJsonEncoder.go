@@ -46,8 +46,7 @@ func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager
 }
 
 func (cj CongressmanJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-	congressman := model.Congressman
-	congressman.Id = lid
+	model.Congressman.Id = lid
 	cj.WriteHeader(http.StatusCreated)
 	cj.EncodeEntity(model)
 }

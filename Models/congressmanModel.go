@@ -46,6 +46,34 @@ func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.Lo
 	return entity, noError
 }
 
+func (cm CongressmanModel) IsEntityFill(entity EntityModel, logManager *manager.LogManager) bool {
+	if entity.Congressman != (CongressmanModel{}) {
+		return true
+	} else {
+		logManager.WriteErrorLog("No Data send to insert")
+		return false
+	}
+}
+func (cm CongressmanModel) PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryCongressMan := "INSERT INTO PROCESSDEPUTES.Congressman(CongressManUid, Civility, FirstName, LastName, Alpha, Trigramme, BirthDate, BirthCity, BirthDepartment, BirthCountry, JobTitle, CatSocPro, FamSocPro) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	stmt, errPrepare := db.Prepare(queryCongressMan)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
+func (cm CongressmanModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
+	congressman := model.Congressman
+	res, errExec := stmt.Exec(congressman.Uid, congressman.Civility, congressman.FirstName,
+		congressman.LastName, congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
+		congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
+		congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
+	return res, "Congressman", errExec
+}
+
 type CongressmansModel []CongressmanModel
 
 func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

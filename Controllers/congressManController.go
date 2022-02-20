@@ -39,7 +39,9 @@ func CreateCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	CreateEntity(congressmanJsonEncoder, r, *repo.LogManager, nil)
+	congressman := models.CongressmanModel{}
+
+	CreateEntity(congressmanJsonEncoder, r, *repo.LogManager, congressman)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
