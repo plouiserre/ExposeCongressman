@@ -58,6 +58,23 @@ func (dm DeputyModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql
 	return res, "Deputy", errExec
 }
 
+func (dm DeputyModel) PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryDeputy := "UPDATE  PROCESSDEPUTES.Deputy SET StartDate=?, EndDate=?, RefDeputy=?, MandateId=? WHERE DeputyId = ?"
+	stmt, errPrepare := db.Prepare(queryDeputy)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
+func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error) {
+	deputy := model.Deputy
+	_, errExec := stmt.Exec(deputy.StartDate, deputy.EndDate, deputy.RefDeputy, deputy.MandateId, id)
+	return "Deputy ", errExec
+}
+
 type DeputiesModel []DeputyModel
 
 func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
