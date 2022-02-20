@@ -11,15 +11,13 @@ import (
 )
 
 func Mandates(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
-
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
 
 	mandates := models.MandatesModel{}
 
-	GetAll(MandateJsonEncoder, r, repo, mandates)
+	GetAll(MandateJsonEncoder, r, mandates)
 }
 
 func Mandate(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +29,7 @@ func Mandate(w http.ResponseWriter, r *http.Request) {
 
 	mandate := models.MandateModel{}
 
-	GetById(MandateJsonEncoder, r, repo, "mandate", *repo.LogManager, mandate)
+	GetById(MandateJsonEncoder, r, "mandate", *repo.LogManager, mandate)
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +38,10 @@ func CreateMandate(w http.ResponseWriter, r *http.Request) {
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	CreateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
+
+	mandate := models.MandateModel{}
+
+	CreateEntity(MandateJsonEncoder, r, *repo.LogManager, mandate)
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {

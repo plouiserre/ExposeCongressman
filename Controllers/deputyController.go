@@ -11,15 +11,13 @@ import (
 )
 
 func Deputies(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitDeputyRepository()
-
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
 		W: w,
 	}
 
 	deputies := models.DeputiesModel{}
 
-	GetAll(deputyJsonEncoder, r, repo, deputies)
+	GetAll(deputyJsonEncoder, r, deputies)
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +29,7 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 
 	deputy := models.DeputyModel{}
 
-	GetById(deputyJsonEncoder, r, repo, "deputy", *repo.LogManager, deputy)
+	GetById(deputyJsonEncoder, r, "deputy", *repo.LogManager, deputy)
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +39,7 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	CreateEntity(deputyJsonEncoder, r, repo, *repo.LogManager)
+	CreateEntity(deputyJsonEncoder, r, *repo.LogManager, nil)
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {

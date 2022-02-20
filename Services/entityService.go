@@ -18,10 +18,12 @@ type EntityService struct {
 	Entity
 	Models models.IModels
 	//TODO trouver un autre nom
-	GetByIdEntity models.IGetByIdEntity
-	repo          repository.RepositoryBase
+	IGetByIdEntity models.IGetByIdEntity
+	ICreateEntity  models.ICreateEntity
+	RepositoryBase repository.RepositoryBase
 }
 
+//TODO à supprimer après
 func (entityService *EntityService) InitRepository(entityType int) (repository.IRepository, Manager.LogManager) {
 	logManager := Manager.LogManager{}
 	logManager.InitLog()
@@ -47,23 +49,19 @@ func (entityService *EntityService) InitRepository(entityType int) (repository.I
 }
 
 func (entityService EntityService) GetAll() (*models.EntityModel, bool) {
-	entities, noError := entityService.repo.GetAll(entityService.Models)
+	entities, noError := entityService.RepositoryBase.GetAll(entityService.Models)
 
 	return entities, noError
 }
 
 func (entityService EntityService) GetById(id int) (*models.EntityModel, bool) {
-	/*entity, noError := repo.GetById(id)
-
-	return entity, noError*/
-
-	entity, noError := entityService.repo.GetById(entityService.GetByIdEntity, id)
+	entity, noError := entityService.RepositoryBase.GetById(entityService.IGetByIdEntity, id)
 
 	return entity, noError
 }
 
-func (entityService EntityService) CreateEntity(repo repository.IRepository, entity *models.EntityModel) (int64, bool) {
-	lid, noError := repo.CreateEntity(entity)
+func (entityService EntityService) CreateEntity(entity *models.EntityModel) (int64, bool) {
+	lid, noError := entityService.RepositoryBase.CreateEntity(entityService.ICreateEntity, entity)
 
 	return lid, noError
 }

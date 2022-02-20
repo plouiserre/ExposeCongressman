@@ -48,6 +48,34 @@ func (mm MandateModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogMan
 	return entity, noError
 }
 
+func (mm MandateModel) IsEntityFill(model EntityModel, logManager *manager.LogManager) bool {
+	if model.Mandate != (MandateModel{}) {
+		return true
+	} else {
+		logManager.WriteErrorLog("No Data send to insert")
+		return false
+	}
+}
+
+func (mm MandateModel) PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryMandate := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, EndDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+	stmt, errPrepare := db.Prepare(queryMandate)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
+func (mm MandateModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
+	mandate := model.Mandate
+	res, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate, mandate.EndDate,
+		mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel, mandate.QualityLabelSex,
+		mandate.RefBody, mandate.CongressmanId)
+	return res, "Mandate ", errExec
+}
+
 type MandatesModel []MandateModel
 
 func (mms MandatesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

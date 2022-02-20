@@ -16,3 +16,9 @@ type IGetByIdEntity interface {
 	QueryGetById(db *sql.DB, id int) (*sql.Rows, error)
 	RowsScanGetById(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool)
 }
+
+type ICreateEntity interface {
+	IsEntityFill(entity EntityModel, logManager *manager.LogManager) bool
+	PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool)
+	ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error)
+}

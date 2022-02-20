@@ -11,15 +11,13 @@ import (
 )
 
 func Congressmans(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
-
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
 	congressmans := models.CongressmansModel{}
 
-	GetAll(congressmanJsonEncoder, r, repo, congressmans)
+	GetAll(congressmanJsonEncoder, r, congressmans)
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +29,7 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	GetById(congressmanJsonEncoder, r, repo, "congressman", *repo.LogManager, congressman)
+	GetById(congressmanJsonEncoder, r, "congressman", *repo.LogManager, congressman)
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +39,7 @@ func CreateCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	CreateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
+	CreateEntity(congressmanJsonEncoder, r, *repo.LogManager, nil)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {

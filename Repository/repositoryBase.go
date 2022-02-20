@@ -72,8 +72,33 @@ func (rb RepositoryBase) GetById(model models.IGetByIdEntity, id int) (*models.E
 	}
 }
 
-func (rb RepositoryBase) CreateEntity(entity *models.EntityModel) (int64, bool) {
-	return 0, false
+func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models.EntityModel) (int64, bool) {
+	db := rb.InitDB()
+	var lid int64
+	noError := true
+
+	isEntityFill := model.IsEntityFill(*entity, rb.LogManager)
+
+	if isEntityFill {
+		stmt, noError := model.PrepareCreateQuery(db, rb.LogManager)
+
+		if noError {
+			res, nameRepository, errExec := model.ExecuteCreateQuery(stmt, *entity)
+			if errExec != nil {
+				rb.LogManager.WriteErrorLog(nameRepository + " Repository : Erreur exécution requête " + errExec.Error())
+				noError = false
+			} else {
+				var errGetLastId error
+				lid, errGetLastId = res.LastInsertId()
+				if errGetLastId != nil {
+					rb.LogManager.WriteErrorLog("Erreur lors de la récupération de l'id enregistré " + errGetLastId.Error())
+				}
+			}
+		}
+	}
+	defer db.Close()
+
+	return lid, noError
 }
 
 func (rb RepositoryBase) UpdateEntity(entity *models.EntityModel, id int) bool {

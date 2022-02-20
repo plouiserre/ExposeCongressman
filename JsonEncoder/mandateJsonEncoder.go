@@ -47,8 +47,7 @@ func (mj MandateJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.Log
 }
 
 func (mj MandateJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-	mandate := model.Mandate
-	mandate.Id = lid
+	model.Mandate.Id = lid
 	mj.WriteHeader(http.StatusCreated)
 	//TODO à améliorer
 	mj.EncodeEntity(model)

@@ -15,11 +15,12 @@ import (
 
 //TODO mettre moins de paramètre dans ses méthodes
 //TODO créer une struct que j'appelerai basecontroller pour éviter de passer à chaque fois tous ses paramètres
-func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, modelsEntities model.IModels) {
-	jsonEncoder.SetHeader()
+func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, modelsEntities model.IModels) {
+	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		Models: modelsEntities,
+		Models:         modelsEntities,
+		RepositoryBase: repositoryBase,
 	}
 
 	entities, noError := entityService.GetAll()
@@ -32,11 +33,13 @@ func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposito
 	}
 }
 
-func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, entityName string, logManager Manager.LogManager, getByIdEntity model.IGetByIdEntity) {
-	jsonEncoder.SetHeader()
+//retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
+func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, entityName string, logManager Manager.LogManager, getByIdEntity model.IGetByIdEntity) {
+	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		GetByIdEntity: getByIdEntity,
+		IGetByIdEntity: getByIdEntity,
+		RepositoryBase: repositoryBase,
 	}
 
 	vars := mux.Vars(r)
@@ -61,10 +64,14 @@ func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo reposit
 	}
 }
 
-func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
-	jsonEncoder.SetHeader()
+//retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
+func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, createEntity model.ICreateEntity) {
+	repositoryBase := InitBaseController(jsonEncoder)
 
-	entityService := services.EntityService{}
+	entityService := services.EntityService{
+		ICreateEntity:  createEntity,
+		RepositoryBase: repositoryBase,
+	}
 
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -76,7 +83,7 @@ func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 		if !noErrorMarhsal {
 			jsonEncoder.WriteHeader(http.StatusBadRequest)
 		} else {
-			lid, noErrorCreation := entityService.CreateEntity(repo, &entity)
+			lid, noErrorCreation := entityService.CreateEntity(&entity)
 			if noErrorCreation {
 				jsonEncoder.ResponseEntityCreated(entity, lid)
 			}
@@ -144,4 +151,18 @@ func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 			jsonEncoder.WriteHeader(http.StatusNotFound)
 		}
 	}
+}
+
+//TODO quand tout sera terminé mettre aussi la partie init EntityService
+func InitBaseController(jsonEncoder jsonEncoder.IJsonEncoder) repository.RepositoryBase {
+	jsonEncoder.SetHeader()
+
+	logManager := Manager.LogManager{}
+	logManager.InitLog()
+
+	repositoryBase := repository.RepositoryBase{
+		LogManager: &logManager,
+	}
+
+	return repositoryBase
 }
