@@ -39,7 +39,9 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	CreateEntity(deputyJsonEncoder, r, *repo.LogManager, nil)
+	deputy := models.DeputyModel{}
+
+	CreateEntity(deputyJsonEncoder, r, *repo.LogManager, deputy)
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {

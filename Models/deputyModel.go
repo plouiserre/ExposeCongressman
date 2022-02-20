@@ -32,6 +32,32 @@ func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogMana
 	return entity, noError
 }
 
+func (dm DeputyModel) IsEntityFill(entity EntityModel, logManager *manager.LogManager) bool {
+	if entity.Deputy != (DeputyModel{}) {
+		return true
+	} else {
+		logManager.WriteErrorLog("No Data send to insert")
+		return false
+	}
+}
+
+func (dm DeputyModel) PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryDeputy := "INSERT INTO PROCESSDEPUTES.Deputy(StartDate, EndDate, RefDeputy, MandateId) VALUES (?,?,?,?)"
+	stmt, errPrepare := db.Prepare(queryDeputy)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
+func (dm DeputyModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
+	deputy := model.Deputy
+	res, errExec := stmt.Exec(deputy.StartDate, deputy.EndDate, deputy.RefDeputy, deputy.MandateId)
+	return res, "Deputy", errExec
+}
+
 type DeputiesModel []DeputyModel
 
 func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

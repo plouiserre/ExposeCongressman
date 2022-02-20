@@ -46,8 +46,7 @@ func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogM
 }
 
 func (dj DeputyJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-	deputy := model.Deputy
-	deputy.Id = lid
+	model.Deputy.Id = lid
 	dj.WriteHeader(http.StatusCreated)
 	dj.EncodeEntity(model)
 }
