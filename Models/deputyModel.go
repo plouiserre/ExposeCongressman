@@ -75,6 +75,18 @@ func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id i
 	return "Deputy ", errExec
 }
 
+//TODO mieux factoriser en mettant juste la requête
+func (dm DeputyModel) PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryDeputy := "DELETE FROM PROCESSDEPUTES.Deputy WHERE DeputyId = ?"
+	stmt, errPrepare := db.Prepare(queryDeputy)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
 type DeputiesModel []DeputyModel
 
 func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

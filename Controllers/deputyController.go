@@ -63,7 +63,9 @@ func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	DeleteEntity(deputyJsonEncoder, r, repo, *repo.LogManager, nil)
+	deputy := models.DeputyModel{}
+
+	DeleteEntity(deputyJsonEncoder, r, repo, *repo.LogManager, deputy)
 }
 
 func InitDeputyRepository() (repository.DeputyRepository, Manager.LogManager) {
