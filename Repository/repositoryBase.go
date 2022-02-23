@@ -118,6 +118,21 @@ func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models
 	return noError
 }
 
-func (rb RepositoryBase) DeleteEntity(id int) (int64, bool) {
-	return 0, false
+func (rb RepositoryBase) DeleteEntity(model models.IDeleteEntity, id int) (int64, bool) {
+	var nbDelete int64
+	db := rb.InitDB()
+	noError := true
+
+	stmt, noError := model.PrepareDeleteQuery(db, rb.LogManager)
+	if noError {
+		result, errExec := stmt.Exec(id)
+		if errExec != nil {
+			rb.LogManager.WriteErrorLog("Congressman Repository : Erreur exécution requête " + errExec.Error())
+			noError = false
+		}
+		nbDelete, _ = result.RowsAffected()
+	}
+	defer db.Close()
+
+	return nbDelete, noError
 }

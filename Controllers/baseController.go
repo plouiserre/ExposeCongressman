@@ -134,10 +134,13 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 	}
 }
 
-func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager) {
-	jsonEncoder.SetHeader()
+func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager, deleteEntity model.IDeleteEntity) {
+	repositoryBase := InitBaseController(jsonEncoder)
 
-	entityService := services.EntityService{}
+	entityService := services.EntityService{
+		IDeleteEntity:  deleteEntity,
+		RepositoryBase: repositoryBase,
+	}
 
 	vars := mux.Vars(r)
 

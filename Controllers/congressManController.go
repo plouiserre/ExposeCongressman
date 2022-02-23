@@ -63,7 +63,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
+	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, nil)
 }
 
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {

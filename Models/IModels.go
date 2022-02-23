@@ -28,3 +28,7 @@ type IUpdateEntity interface {
 	PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool)
 	ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error)
 }
+
+type IDeleteEntity interface {
+	PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool)
+}

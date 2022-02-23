@@ -63,7 +63,10 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	DeleteEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
+
+	mandate := models.MandateModel{}
+
+	DeleteEntity(MandateJsonEncoder, r, repo, *repo.LogManager, mandate)
 }
 
 func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {

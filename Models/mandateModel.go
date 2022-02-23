@@ -95,6 +95,17 @@ func (mm MandateModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id 
 	return "Mandate ", errExec
 }
 
+func (mm MandateModel) PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryDeputy := "DELETE FROM PROCESSDEPUTES.Mandate WHERE MandateId = ?"
+	stmt, errPrepare := db.Prepare(queryDeputy)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
 type MandatesModel []MandateModel
 
 func (mms MandatesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {

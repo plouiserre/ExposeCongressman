@@ -21,6 +21,7 @@ type EntityService struct {
 	IGetByIdEntity models.IGetByIdEntity
 	ICreateEntity  models.ICreateEntity
 	IUpdateEntity  models.IUpdateEntity
+	IDeleteEntity  models.IDeleteEntity
 	RepositoryBase repository.RepositoryBase
 }
 
@@ -74,7 +75,7 @@ func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id i
 }
 
 func (entityService EntityService) DeleteEntity(repo repository.IRepository, id int) (int64, bool) {
-	nbDelete, noError := repo.DeleteEntity(id)
+	nbDelete, noError := entityService.RepositoryBase.DeleteEntity(entityService.IDeleteEntity, id)
 
 	return nbDelete, noError
 }
