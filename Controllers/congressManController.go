@@ -63,7 +63,9 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, nil)
+	congressman := models.CongressmanModel{}
+
+	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, congressman)
 }
 
 func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {

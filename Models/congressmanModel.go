@@ -94,6 +94,17 @@ func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel,
 	return "Congressman ", errExec
 }
 
+func (cm CongressmanModel) PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
+	noError := true
+	queryDeputy := "DELETE FROM PROCESSDEPUTES.Congressman WHERE CongressManId = ?"
+	stmt, errPrepare := db.Prepare(queryDeputy)
+	if errPrepare != nil {
+		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	}
+	return stmt, noError
+}
+
 type CongressmansModel []CongressmanModel
 
 func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
