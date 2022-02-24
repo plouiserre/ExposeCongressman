@@ -14,9 +14,9 @@ type DeputyModel struct {
 	MandateId int64          `json:"MandateId"`
 }
 
-func (dm DeputyModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
-	row, err := db.Query("select * FROM PROCESSDEPUTES.Deputy where DeputyId=?;", id)
-	return row, err
+func (dm DeputyModel) QueryGetById() string {
+	query := "select * FROM PROCESSDEPUTES.Deputy where DeputyId=?;"
+	return query
 }
 func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
 	var deputy DeputyModel
@@ -41,15 +41,10 @@ func (dm DeputyModel) IsEntityFill(entity EntityModel, logManager *manager.LogMa
 	}
 }
 
-func (dm DeputyModel) PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (dm DeputyModel) QueryCreate() string {
 	queryDeputy := "INSERT INTO PROCESSDEPUTES.Deputy(StartDate, EndDate, RefDeputy, MandateId) VALUES (?,?,?,?)"
-	stmt, errPrepare := db.Prepare(queryDeputy)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+
+	return queryDeputy
 }
 
 func (dm DeputyModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
@@ -58,33 +53,21 @@ func (dm DeputyModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql
 	return res, "Deputy", errExec
 }
 
-func (dm DeputyModel) PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (dm DeputyModel) QueryUpdate() string {
 	queryDeputy := "UPDATE  PROCESSDEPUTES.Deputy SET StartDate=?, EndDate=?, RefDeputy=?, MandateId=? WHERE DeputyId = ?"
-	stmt, errPrepare := db.Prepare(queryDeputy)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+	return queryDeputy
 }
 
-func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error) {
+func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int64) (string, error) {
 	deputy := model.Deputy
 	_, errExec := stmt.Exec(deputy.StartDate, deputy.EndDate, deputy.RefDeputy, deputy.MandateId, id)
 	return "Deputy ", errExec
 }
 
 //TODO mieux factoriser en mettant juste la requête
-func (dm DeputyModel) PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (dm DeputyModel) QueryDelete() string {
 	queryDeputy := "DELETE FROM PROCESSDEPUTES.Deputy WHERE DeputyId = ?"
-	stmt, errPrepare := db.Prepare(queryDeputy)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+	return queryDeputy
 }
 
 type DeputiesModel []DeputyModel

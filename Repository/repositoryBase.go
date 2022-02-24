@@ -39,7 +39,6 @@ func (rb RepositoryBase) GetAll(model models.IModels) (*models.EntityModel, bool
 	} else {
 		defer rows.Close()
 
-		//TODO changer le renvoi de rowscangetentities plus tard
 		entities, noError = model.RowsScanGetEntities(rows, rb.LogManager)
 	}
 
@@ -52,7 +51,9 @@ func (rb RepositoryBase) GetById(model models.IGetByIdEntity, id int) (*models.E
 	noError := true
 	isEmpty := false
 
-	row, err := model.QueryGetById(db, id)
+	query := model.QueryGetById()
+
+	row, err := db.Query(query, id)
 
 	if err != nil {
 		rb.LogManager.WriteErrorLog("Erreur requête " + err.Error())
@@ -80,9 +81,12 @@ func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models
 	isEntityFill := model.IsEntityFill(*entity, rb.LogManager)
 
 	if isEntityFill {
-		stmt, noError := model.PrepareCreateQuery(db, rb.LogManager)
-
-		if noError {
+		queryCreate := model.QueryCreate()
+		stmt, errPrepare := db.Prepare(queryCreate)
+		if errPrepare != nil {
+			rb.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+			noError = false
+		} else {
 			res, nameRepository, errExec := model.ExecuteCreateQuery(stmt, *entity)
 			if errExec != nil {
 				rb.LogManager.WriteErrorLog(nameRepository + " Repository : Erreur exécution requête " + errExec.Error())
@@ -101,12 +105,16 @@ func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models
 	return lid, noError
 }
 
-func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models.EntityModel, id int) bool {
+func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models.EntityModel, id int64) (int64, bool) {
 	db := rb.InitDB()
 	noError := true
 
-	stmt, noError := model.PrepareUpdateQuery(db, rb.LogManager)
-	if noError {
+	queryUpdate := model.QueryUpdate()
+	stmt, errPrepare := db.Prepare(queryUpdate)
+	if errPrepare != nil {
+		rb.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	} else {
 		nameRepository, errExec := model.ExecuteUpdateQuery(stmt, *entity, id)
 		if errExec != nil {
 			rb.LogManager.WriteErrorLog(nameRepository + "Repository : Erreur exécution requête " + errExec.Error())
@@ -115,7 +123,7 @@ func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models
 	}
 
 	defer db.Close()
-	return noError
+	return id, noError
 }
 
 func (rb RepositoryBase) DeleteEntity(model models.IDeleteEntity, id int) (int64, bool) {
@@ -123,10 +131,15 @@ func (rb RepositoryBase) DeleteEntity(model models.IDeleteEntity, id int) (int64
 	db := rb.InitDB()
 	noError := true
 
-	stmt, noError := model.PrepareDeleteQuery(db, rb.LogManager)
-	if noError {
+	queryDelete := model.QueryDelete()
+	stmt, errPrepare := db.Prepare(queryDelete)
+	if errPrepare != nil {
+		rb.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
+		noError = false
+	} else {
 		result, errExec := stmt.Exec(id)
 		if errExec != nil {
+			//TODO corriger ce log
 			rb.LogManager.WriteErrorLog("Congressman Repository : Erreur exécution requête " + errExec.Error())
 			noError = false
 		}

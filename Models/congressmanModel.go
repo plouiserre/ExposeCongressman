@@ -23,9 +23,9 @@ type CongressmanModel struct {
 	FamSocPro       string `json:"FamSocPro"`
 }
 
-func (cm CongressmanModel) QueryGetById(db *sql.DB, id int) (*sql.Rows, error) {
-	row, err := db.Query("select * FROM PROCESSDEPUTES.CongressMan where CongressManId=?;", id)
-	return row, err
+func (cm CongressmanModel) QueryGetById() string {
+	query := "select * FROM PROCESSDEPUTES.CongressMan where CongressManId=?;"
+	return query
 }
 
 func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
@@ -54,15 +54,10 @@ func (cm CongressmanModel) IsEntityFill(entity EntityModel, logManager *manager.
 		return false
 	}
 }
-func (cm CongressmanModel) PrepareCreateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (cm CongressmanModel) QueryCreate() string {
 	queryCongressMan := "INSERT INTO PROCESSDEPUTES.Congressman(CongressManUid, Civility, FirstName, LastName, Alpha, Trigramme, BirthDate, BirthCity, BirthDepartment, BirthCountry, JobTitle, CatSocPro, FamSocPro) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	stmt, errPrepare := db.Prepare(queryCongressMan)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+
+	return queryCongressMan
 }
 
 func (cm CongressmanModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
@@ -74,18 +69,12 @@ func (cm CongressmanModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel)
 	return res, "Congressman", errExec
 }
 
-func (cm CongressmanModel) PrepareUpdateQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (cm CongressmanModel) QueryUpdate() string {
 	queryCongressMan := "UPDATE  PROCESSDEPUTES.Congressman SET Civility=?, FirstName=?, LastName=?, Alpha=?, Trigramme=?, BirthDate=?, BirthCity=?, BirthDepartment=?, BirthCountry=?, JobTitle=?, CatSocPro=?, FamSocPro=? WHERE CongressManId = ?"
-	stmt, errPrepare := db.Prepare(queryCongressMan)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+	return queryCongressMan
 }
 
-func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int) (string, error) {
+func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int64) (string, error) {
 	congressman := model.Congressman
 	_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
 		congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
@@ -94,15 +83,9 @@ func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel,
 	return "Congressman ", errExec
 }
 
-func (cm CongressmanModel) PrepareDeleteQuery(db *sql.DB, logManager *manager.LogManager) (*sql.Stmt, bool) {
-	noError := true
+func (cm CongressmanModel) QueryDelete() string {
 	queryDeputy := "DELETE FROM PROCESSDEPUTES.Congressman WHERE CongressManId = ?"
-	stmt, errPrepare := db.Prepare(queryDeputy)
-	if errPrepare != nil {
-		logManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
-		noError = false
-	}
-	return stmt, noError
+	return queryDeputy
 }
 
 type CongressmansModel []CongressmanModel

@@ -68,10 +68,10 @@ func (entityService EntityService) CreateEntity(entity *models.EntityModel) (int
 	return lid, noError
 }
 
-func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id int) bool {
-	noError := entityService.RepositoryBase.UpdateEntity(entityService.IUpdateEntity, entity, id)
+func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id int64) (int64, bool) {
+	id, noError := entityService.RepositoryBase.UpdateEntity(entityService.IUpdateEntity, entity, id)
 
-	return noError
+	return id, noError
 }
 
 func (entityService EntityService) DeleteEntity(repo repository.IRepository, id int) (int64, bool) {

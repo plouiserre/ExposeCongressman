@@ -46,9 +46,8 @@ func (mj MandateJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.Log
 	return entityResult, noError
 }
 
-func (mj MandateJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
+func (mj MandateJsonEncoder) ResponseEntity(model models.EntityModel, lid int64, statusCode int) {
 	model.Mandate.Id = lid
-	mj.WriteHeader(http.StatusCreated)
-	//TODO à améliorer
+	mj.WriteHeader(statusCode)
 	mj.EncodeEntity(model)
 }

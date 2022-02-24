@@ -11,7 +11,6 @@ type LogManager struct {
 }
 
 func (logManager *LogManager) InitLog() {
-	//TODO put in confile file the directory of log file
 	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)

@@ -85,7 +85,7 @@ func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 		} else {
 			lid, noErrorCreation := entityService.CreateEntity(&entity)
 			if noErrorCreation {
-				jsonEncoder.ResponseEntityCreated(entity, lid)
+				jsonEncoder.ResponseEntity(entity, lid, http.StatusCreated)
 			}
 		}
 	}
@@ -121,12 +121,12 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 			} else {
 				entity, noErrorMarhsal := jsonEncoder.UnmarshalEntity(body, logManager)
 				if noErrorMarhsal {
-					noError := entityService.UpdateEntity(&entity, id)
+					updateId := int64(id)
+					updateId, noError := entityService.UpdateEntity(&entity, updateId)
 					if !noError {
 						jsonEncoder.WriteHeader(http.StatusInternalServerError)
 					} else {
-						jsonEncoder.WriteHeader(http.StatusOK)
-						jsonEncoder.EncodeEntity(entity)
+						jsonEncoder.ResponseEntity(entity, updateId, http.StatusOK)
 					}
 				}
 			}

@@ -11,5 +11,5 @@ type IJsonEncoder interface {
 	EncodeEntity(model models.EntityModel)
 	SetHeader()
 	UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool)
-	ResponseEntityCreated(model models.EntityModel, lid int64)
+	ResponseEntity(model models.EntityModel, lid int64, statusCode int)
 }
