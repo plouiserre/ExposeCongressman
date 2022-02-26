@@ -92,7 +92,7 @@ func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 }
 
 //TODO retravailler les paramètres
-func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager, updateEntity model.IUpdateEntity, getByIdEntity model.IGetByIdEntity) {
+func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, updateEntity model.IUpdateEntity, getByIdEntity model.IGetByIdEntity) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
@@ -134,7 +134,7 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 	}
 }
 
-func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo repository.IRepository, logManager Manager.LogManager, deleteEntity model.IDeleteEntity) {
+func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, deleteEntity model.IDeleteEntity) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
@@ -149,7 +149,7 @@ func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, repo re
 		jsonEncoder.WriteHeader(http.StatusBadRequest)
 		logManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		nbDelete, noError := entityService.DeleteEntity(repo, id)
+		nbDelete, noError := entityService.DeleteEntity(id)
 
 		if !noError {
 			jsonEncoder.WriteHeader(http.StatusInternalServerError)
@@ -173,4 +173,10 @@ func InitBaseController(jsonEncoder jsonEncoder.IJsonEncoder) repository.Reposit
 	}
 
 	return repositoryBase
+}
+
+func InitLogManager() Manager.LogManager {
+	entityService := services.EntityService{}
+	logManager := entityService.InitLogManager()
+	return logManager
 }

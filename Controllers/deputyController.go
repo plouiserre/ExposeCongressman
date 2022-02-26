@@ -4,10 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
-	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
-	repository "github.com/plouiserre/exposecongressman/Repository"
-	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Deputies(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +18,7 @@ func Deputies(w http.ResponseWriter, r *http.Request) {
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitDeputyRepository()
+	logManager := InitLogManager()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
 		W: w,
@@ -29,11 +26,11 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 
 	deputy := models.DeputyModel{}
 
-	GetById(deputyJsonEncoder, r, "deputy", *repo.LogManager, deputy)
+	GetById(deputyJsonEncoder, r, "deputy", logManager, deputy)
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitDeputyRepository()
+	logManager := InitLogManager()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
 		W: w,
@@ -41,11 +38,11 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 
 	deputy := models.DeputyModel{}
 
-	CreateEntity(deputyJsonEncoder, r, *repo.LogManager, deputy)
+	CreateEntity(deputyJsonEncoder, r, logManager, deputy)
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitDeputyRepository()
+	logManager := InitLogManager()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
 		W: w,
@@ -53,11 +50,11 @@ func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
 
 	deputy := models.DeputyModel{}
 
-	UpdateEntity(deputyJsonEncoder, r, repo, *repo.LogManager, deputy, deputy)
+	UpdateEntity(deputyJsonEncoder, r, logManager, deputy, deputy)
 }
 
 func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitDeputyRepository()
+	logManager := InitLogManager()
 
 	deputyJsonEncoder := jsonEncoder.DeputyJsonEncoder{
 		W: w,
@@ -65,12 +62,5 @@ func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
 
 	deputy := models.DeputyModel{}
 
-	DeleteEntity(deputyJsonEncoder, r, repo, *repo.LogManager, deputy)
-}
-
-func InitDeputyRepository() (repository.DeputyRepository, Manager.LogManager) {
-	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(2)
-	deputyRepo := repo.(repository.DeputyRepository)
-	return deputyRepo, logManager
+	DeleteEntity(deputyJsonEncoder, r, logManager, deputy)
 }

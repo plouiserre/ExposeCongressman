@@ -4,10 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
-	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
-	repository "github.com/plouiserre/exposecongressman/Repository"
-	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Mandates(w http.ResponseWriter, r *http.Request) {
@@ -21,19 +18,18 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 }
 
 func Mandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
-
+	logManager := InitLogManager()
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
 
 	mandate := models.MandateModel{}
 
-	GetById(MandateJsonEncoder, r, "mandate", *repo.LogManager, mandate)
+	GetById(MandateJsonEncoder, r, "mandate", logManager, mandate)
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
@@ -41,11 +37,11 @@ func CreateMandate(w http.ResponseWriter, r *http.Request) {
 
 	mandate := models.MandateModel{}
 
-	CreateEntity(MandateJsonEncoder, r, *repo.LogManager, mandate)
+	CreateEntity(MandateJsonEncoder, r, logManager, mandate)
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
@@ -54,11 +50,11 @@ func UpdateMandate(w http.ResponseWriter, r *http.Request) {
 	mandate := models.MandateModel{}
 
 	//TODO changer ca car troooooop moche
-	UpdateEntity(MandateJsonEncoder, r, repo, *repo.LogManager, mandate, mandate)
+	UpdateEntity(MandateJsonEncoder, r, logManager, mandate, mandate)
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
@@ -66,12 +62,5 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 
 	mandate := models.MandateModel{}
 
-	DeleteEntity(MandateJsonEncoder, r, repo, *repo.LogManager, mandate)
-}
-
-func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {
-	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(1)
-	mandateRepo := repo.(repository.MandateRepository)
-	return mandateRepo, logManager
+	DeleteEntity(MandateJsonEncoder, r, logManager, mandate)
 }

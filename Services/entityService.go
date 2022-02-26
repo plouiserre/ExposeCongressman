@@ -26,28 +26,11 @@ type EntityService struct {
 }
 
 //TODO à supprimer après
-func (entityService *EntityService) InitRepository(entityType int) (repository.IRepository, Manager.LogManager) {
+func (entityService *EntityService) InitLogManager() Manager.LogManager {
 	logManager := Manager.LogManager{}
 	logManager.InitLog()
 
-	entityService.Entity = Entity(entityType)
-
-	if entityService.Entity == Congressman {
-		congressmanRepository := repository.CongressmanRepository{
-			LogManager: &logManager,
-		}
-		return congressmanRepository, logManager
-	} else if entityService.Entity == Mandate {
-		mandateRepository := repository.MandateRepository{
-			LogManager: &logManager,
-		}
-		return mandateRepository, logManager
-	} else {
-		deputyRepository := repository.DeputyRepository{
-			LogManager: &logManager,
-		}
-		return deputyRepository, logManager
-	}
+	return logManager
 }
 
 func (entityService EntityService) GetAll() (*models.EntityModel, bool) {
@@ -74,7 +57,7 @@ func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id i
 	return id, noError
 }
 
-func (entityService EntityService) DeleteEntity(repo repository.IRepository, id int) (int64, bool) {
+func (entityService EntityService) DeleteEntity(id int) (int64, bool) {
 	nbDelete, noError := entityService.RepositoryBase.DeleteEntity(entityService.IDeleteEntity, id)
 
 	return nbDelete, noError

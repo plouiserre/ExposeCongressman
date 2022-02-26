@@ -4,10 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
-	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
-	repository "github.com/plouiserre/exposecongressman/Repository"
-	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Congressmans(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +18,7 @@ func Congressmans(w http.ResponseWriter, r *http.Request) {
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
@@ -29,11 +26,11 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	GetById(congressmanJsonEncoder, r, "congressman", *repo.LogManager, congressman)
+	GetById(congressmanJsonEncoder, r, "congressman", logManager, congressman)
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
@@ -41,11 +38,11 @@ func CreateCongressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	CreateEntity(congressmanJsonEncoder, r, *repo.LogManager, congressman)
+	CreateEntity(congressmanJsonEncoder, r, logManager, congressman)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
@@ -53,11 +50,11 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	UpdateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, congressman, congressman)
+	UpdateEntity(congressmanJsonEncoder, r, logManager, congressman, congressman)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
@@ -65,12 +62,5 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager, congressman)
-}
-
-func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
-	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(0)
-	congressmanRepo := repo.(repository.CongressmanRepository)
-	return congressmanRepo, logManager
+	DeleteEntity(congressmanJsonEncoder, r, logManager, congressman)
 }
