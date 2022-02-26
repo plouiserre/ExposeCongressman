@@ -45,7 +45,7 @@ func (rb RepositoryBase) GetAll(model models.IModels) (*models.EntityModel, bool
 	return &entities, noError
 }
 
-func (rb RepositoryBase) GetById(model models.IGetByIdEntity, id int) (*models.EntityModel, bool) {
+func (rb RepositoryBase) GetById(model models.IModel, id int) (*models.EntityModel, bool) {
 	var entity models.EntityModel
 	db := rb.InitDB()
 	noError := true
@@ -73,7 +73,7 @@ func (rb RepositoryBase) GetById(model models.IGetByIdEntity, id int) (*models.E
 	}
 }
 
-func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models.EntityModel) (int64, bool) {
+func (rb RepositoryBase) CreateEntity(model models.IModel, entity *models.EntityModel) (int64, bool) {
 	db := rb.InitDB()
 	var lid int64
 	noError := true
@@ -105,7 +105,7 @@ func (rb RepositoryBase) CreateEntity(model models.ICreateEntity, entity *models
 	return lid, noError
 }
 
-func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models.EntityModel, id int64) (int64, bool) {
+func (rb RepositoryBase) UpdateEntity(model models.IModel, entity *models.EntityModel, id int64) (int64, bool) {
 	db := rb.InitDB()
 	noError := true
 
@@ -126,7 +126,7 @@ func (rb RepositoryBase) UpdateEntity(model models.IUpdateEntity, entity *models
 	return id, noError
 }
 
-func (rb RepositoryBase) DeleteEntity(model models.IDeleteEntity, id int) (int64, bool) {
+func (rb RepositoryBase) DeleteEntity(model models.IModel, id int) (int64, bool) {
 	var nbDelete int64
 	db := rb.InitDB()
 	noError := true

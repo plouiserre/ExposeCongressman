@@ -50,7 +50,7 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 
 	congressman := models.CongressmanModel{}
 
-	UpdateEntity(congressmanJsonEncoder, r, logManager, congressman, congressman)
+	UpdateEntity(congressmanJsonEncoder, r, logManager, congressman)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {

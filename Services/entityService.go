@@ -18,10 +18,7 @@ type EntityService struct {
 	Entity
 	Models models.IModels
 	//TODO trouver un autre nom
-	IGetByIdEntity models.IGetByIdEntity
-	ICreateEntity  models.ICreateEntity
-	IUpdateEntity  models.IUpdateEntity
-	IDeleteEntity  models.IDeleteEntity
+	IModel         models.IModel
 	RepositoryBase repository.RepositoryBase
 }
 
@@ -40,25 +37,25 @@ func (entityService EntityService) GetAll() (*models.EntityModel, bool) {
 }
 
 func (entityService EntityService) GetById(id int) (*models.EntityModel, bool) {
-	entity, noError := entityService.RepositoryBase.GetById(entityService.IGetByIdEntity, id)
+	entity, noError := entityService.RepositoryBase.GetById(entityService.IModel, id)
 
 	return entity, noError
 }
 
 func (entityService EntityService) CreateEntity(entity *models.EntityModel) (int64, bool) {
-	lid, noError := entityService.RepositoryBase.CreateEntity(entityService.ICreateEntity, entity)
+	lid, noError := entityService.RepositoryBase.CreateEntity(entityService.IModel, entity)
 
 	return lid, noError
 }
 
 func (entityService EntityService) UpdateEntity(entity *models.EntityModel, id int64) (int64, bool) {
-	id, noError := entityService.RepositoryBase.UpdateEntity(entityService.IUpdateEntity, entity, id)
+	id, noError := entityService.RepositoryBase.UpdateEntity(entityService.IModel, entity, id)
 
 	return id, noError
 }
 
 func (entityService EntityService) DeleteEntity(id int) (int64, bool) {
-	nbDelete, noError := entityService.RepositoryBase.DeleteEntity(entityService.IDeleteEntity, id)
+	nbDelete, noError := entityService.RepositoryBase.DeleteEntity(entityService.IModel, id)
 
 	return nbDelete, noError
 }

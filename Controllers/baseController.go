@@ -34,11 +34,11 @@ func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, modelsEntitie
 }
 
 //retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
-func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, entityName string, logManager Manager.LogManager, getByIdEntity model.IGetByIdEntity) {
+func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, entityName string, logManager Manager.LogManager, getByIdEntity model.IModel) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		IGetByIdEntity: getByIdEntity,
+		IModel:         getByIdEntity,
 		RepositoryBase: repositoryBase,
 	}
 
@@ -65,11 +65,11 @@ func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, entityName s
 }
 
 //retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
-func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, createEntity model.ICreateEntity) {
+func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, createEntity model.IModel) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		ICreateEntity:  createEntity,
+		IModel:         createEntity,
 		RepositoryBase: repositoryBase,
 	}
 
@@ -92,12 +92,11 @@ func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 }
 
 //TODO retravailler les paramètres
-func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, updateEntity model.IUpdateEntity, getByIdEntity model.IGetByIdEntity) {
+func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, updateEntity model.IModel) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		IUpdateEntity:  updateEntity,
-		IGetByIdEntity: getByIdEntity,
+		IModel:         updateEntity,
 		RepositoryBase: repositoryBase,
 	}
 
@@ -134,11 +133,11 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 	}
 }
 
-func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, deleteEntity model.IDeleteEntity) {
+func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, deleteEntity model.IModel) {
 	repositoryBase := InitBaseController(jsonEncoder)
 
 	entityService := services.EntityService{
-		IDeleteEntity:  deleteEntity,
+		IModel:         deleteEntity,
 		RepositoryBase: repositoryBase,
 	}
 
