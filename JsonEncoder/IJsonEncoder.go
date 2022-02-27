@@ -7,9 +7,9 @@ import (
 
 type IJsonEncoder interface {
 	WriteHeader(httpStatusCode int)
-	EncodeEntities(models models.EntityModel)
-	EncodeEntity(model models.EntityModel)
+	EncodeEntities(models models.IModels)
+	EncodeEntity(model models.IModel)
 	SetHeader()
-	UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool)
-	ResponseEntity(model models.EntityModel, lid int64, statusCode int)
+	UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.IModel, bool)
+	ResponseEntity(model models.IModel, lid int64, statusCode int)
 }

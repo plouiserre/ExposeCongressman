@@ -14,7 +14,7 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 
 	mandates := models.MandatesModel{}
 
-	GetAll(MandateJsonEncoder, r, mandates)
+	GetAll(MandateJsonEncoder, r, &mandates)
 }
 
 func Mandate(w http.ResponseWriter, r *http.Request) {

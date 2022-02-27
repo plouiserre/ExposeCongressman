@@ -18,9 +18,9 @@ func (dm DeputyModel) QueryGetById() string {
 	query := "select * FROM PROCESSDEPUTES.Deputy where DeputyId=?;"
 	return query
 }
-func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+
+func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (IModel, bool) {
 	var deputy DeputyModel
-	var entity EntityModel
 	noError := true
 	errScan := row.Scan(&deputy.Id, &deputy.StartDate, &deputy.EndDate, &deputy.RefDeputy, &deputy.MandateId)
 
@@ -28,12 +28,12 @@ func (dm DeputyModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogMana
 		logManager.WriteErrorLog("Erreur récupération du résultat " + errScan.Error())
 		noError = false
 	}
-	entity.Deputy = deputy
-	return entity, noError
+	return deputy, noError
 }
 
-func (dm DeputyModel) IsEntityFill(entity EntityModel, logManager *manager.LogManager) bool {
-	if entity.Deputy != (DeputyModel{}) {
+func (dm DeputyModel) IsEntityFill(model IModel, logManager *manager.LogManager) bool {
+	deputy := model.(DeputyModel)
+	if deputy != (DeputyModel{}) {
 		return true
 	} else {
 		logManager.WriteErrorLog("No Data send to insert")
@@ -47,9 +47,8 @@ func (dm DeputyModel) QueryCreate() string {
 	return queryDeputy
 }
 
-func (dm DeputyModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
-	deputy := model.Deputy
-	res, errExec := stmt.Exec(deputy.StartDate, deputy.EndDate, deputy.RefDeputy, deputy.MandateId)
+func (dm DeputyModel) ExecuteCreateQuery(model IModel, stmt *sql.Stmt) (sql.Result, string, error) {
+	res, errExec := stmt.Exec(dm.StartDate, dm.EndDate, dm.RefDeputy, dm.MandateId)
 	return res, "Deputy", errExec
 }
 
@@ -58,9 +57,8 @@ func (dm DeputyModel) QueryUpdate() string {
 	return queryDeputy
 }
 
-func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int64) (string, error) {
-	deputy := model.Deputy
-	_, errExec := stmt.Exec(deputy.StartDate, deputy.EndDate, deputy.RefDeputy, deputy.MandateId, id)
+func (dm DeputyModel) ExecuteUpdateQuery(stmt *sql.Stmt, id int64) (string, error) {
+	_, errExec := stmt.Exec(dm.StartDate, dm.EndDate, dm.RefDeputy, dm.MandateId, id)
 	return "Deputy ", errExec
 }
 
@@ -77,9 +75,8 @@ func (dms DeputiesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
 	return rows, err
 }
 
-func (dms DeputiesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+func (dms DeputiesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (IModels, bool) {
 	var deputies DeputiesModel
-	var entities EntityModel
 	noError := true
 
 	for rows.Next() {
@@ -93,6 +90,5 @@ func (dms DeputiesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager
 
 		deputies = append(deputies, deputy)
 	}
-	entities.Deputies = deputies
-	return entities, noError
+	return deputies, noError
 }

@@ -28,9 +28,8 @@ func (cm CongressmanModel) QueryGetById() string {
 	return query
 }
 
-func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (IModel, bool) {
 	var congressman CongressmanModel
-	var entity EntityModel
 	noError := true
 
 	errScan := row.Scan(&congressman.Id, &congressman.Uid, &congressman.Civility, &congressman.FirstName,
@@ -42,12 +41,13 @@ func (cm CongressmanModel) RowsScanGetById(row *sql.Rows, logManager *manager.Lo
 		logManager.WriteErrorLog("Erreur récupération du résultat " + errScan.Error())
 		noError = false
 	}
-	entity.Congressman = congressman
-	return entity, noError
+
+	return congressman, noError
 }
 
-func (cm CongressmanModel) IsEntityFill(entity EntityModel, logManager *manager.LogManager) bool {
-	if entity.Congressman != (CongressmanModel{}) {
+func (cm CongressmanModel) IsEntityFill(model IModel, logManager *manager.LogManager) bool {
+	congressman := model.(CongressmanModel)
+	if congressman != (CongressmanModel{}) {
 		return true
 	} else {
 		logManager.WriteErrorLog("No Data send to insert")
@@ -60,11 +60,10 @@ func (cm CongressmanModel) QueryCreate() string {
 	return queryCongressMan
 }
 
-func (cm CongressmanModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
-	congressman := model.Congressman
-	res, errExec := stmt.Exec(congressman.Uid, congressman.Civility, congressman.FirstName,
-		congressman.LastName, congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
-		congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
+func (cm CongressmanModel) ExecuteCreateQuery(model IModel, stmt *sql.Stmt) (sql.Result, string, error) {
+	congressman := model.(CongressmanModel)
+	res, errExec := stmt.Exec(congressman.Uid, congressman.Civility, congressman.FirstName, congressman.LastName, congressman.Alpha,
+		congressman.Trigramme, congressman.BirthDate, congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
 		congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro)
 	return res, "Congressman", errExec
 }
@@ -74,12 +73,9 @@ func (cm CongressmanModel) QueryUpdate() string {
 	return queryCongressMan
 }
 
-func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int64) (string, error) {
-	congressman := model.Congressman
-	_, errExec := stmt.Exec(congressman.Civility, congressman.FirstName, congressman.LastName,
-		congressman.Alpha, congressman.Trigramme, congressman.BirthDate,
-		congressman.BirthCity, congressman.BirthDepartment, congressman.BirthCountry,
-		congressman.Jobtitle, congressman.CatSocPro, congressman.FamSocPro, id)
+func (cm CongressmanModel) ExecuteUpdateQuery(stmt *sql.Stmt, id int64) (string, error) {
+	_, errExec := stmt.Exec(cm.Civility, cm.FirstName, cm.LastName, cm.Alpha, cm.Trigramme, cm.BirthDate, cm.BirthCity, cm.BirthDepartment,
+		cm.BirthCountry, cm.Jobtitle, cm.CatSocPro, cm.FamSocPro, id)
 	return "Congressman ", errExec
 }
 
@@ -95,9 +91,8 @@ func (cms CongressmansModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
 	return rows, err
 }
 
-func (cms CongressmansModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+func (cms CongressmansModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (IModels, bool) {
 	var congressmans CongressmansModel
-	var entities EntityModel
 	noError := true
 
 	for rows.Next() {
@@ -114,6 +109,5 @@ func (cms CongressmansModel) RowsScanGetEntities(rows *sql.Rows, logManager *man
 
 		congressmans = append(congressmans, congressman)
 	}
-	entities.Congressmans = congressmans
-	return entities, noError
+	return congressmans, noError
 }

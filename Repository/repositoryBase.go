@@ -26,10 +26,10 @@ func (rb RepositoryBase) InitDB() (db *sql.DB) {
 	return db
 }
 
-func (rb RepositoryBase) GetAll(model models.IModels) (*models.EntityModel, bool) {
-	entities := models.EntityModel{}
+func (rb RepositoryBase) GetAll(model models.IModels) (*models.IModels, bool) {
 	db := rb.InitDB()
 	noError := true
+	var entities models.IModels
 
 	rows, err := model.GetQuery(db)
 
@@ -45,8 +45,7 @@ func (rb RepositoryBase) GetAll(model models.IModels) (*models.EntityModel, bool
 	return &entities, noError
 }
 
-func (rb RepositoryBase) GetById(model models.IModel, id int) (*models.EntityModel, bool) {
-	var entity models.EntityModel
+func (rb RepositoryBase) GetById(model models.IModel, id int) (*models.IModel, bool) {
 	db := rb.InitDB()
 	noError := true
 	isEmpty := false
@@ -60,21 +59,22 @@ func (rb RepositoryBase) GetById(model models.IModel, id int) (*models.EntityMod
 		noError = false
 	} else {
 		if row.Next() {
-			entity, noError = model.RowsScanGetById(row, rb.LogManager)
+			model, noError = model.RowsScanGetById(row, rb.LogManager)
 		} else {
 			isEmpty = true
 		}
 		row.Close()
 	}
 	if !isEmpty {
-		return &entity, noError
+		return &model, noError
 	} else {
 		return nil, noError
 	}
 }
 
-func (rb RepositoryBase) CreateEntity(model models.IModel, entity *models.EntityModel) (int64, bool) {
+func (rb RepositoryBase) CreateEntity(entity *models.IModel) (int64, bool) {
 	db := rb.InitDB()
+	model := *entity
 	var lid int64
 	noError := true
 
@@ -87,7 +87,7 @@ func (rb RepositoryBase) CreateEntity(model models.IModel, entity *models.Entity
 			rb.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
 			noError = false
 		} else {
-			res, nameRepository, errExec := model.ExecuteCreateQuery(stmt, *entity)
+			res, nameRepository, errExec := model.ExecuteCreateQuery(*entity, stmt)
 			if errExec != nil {
 				rb.LogManager.WriteErrorLog(nameRepository + " Repository : Erreur exécution requête " + errExec.Error())
 				noError = false
@@ -105,8 +105,9 @@ func (rb RepositoryBase) CreateEntity(model models.IModel, entity *models.Entity
 	return lid, noError
 }
 
-func (rb RepositoryBase) UpdateEntity(model models.IModel, entity *models.EntityModel, id int64) (int64, bool) {
+func (rb RepositoryBase) UpdateEntity(entity *models.IModel, id int64) (int64, bool) {
 	db := rb.InitDB()
+	model := *entity
 	noError := true
 
 	queryUpdate := model.QueryUpdate()
@@ -115,7 +116,7 @@ func (rb RepositoryBase) UpdateEntity(model models.IModel, entity *models.Entity
 		rb.LogManager.WriteErrorLog("Erreur récupération du résultat " + errPrepare.Error())
 		noError = false
 	} else {
-		nameRepository, errExec := model.ExecuteUpdateQuery(stmt, *entity, id)
+		nameRepository, errExec := model.ExecuteUpdateQuery(stmt, id)
 		if errExec != nil {
 			rb.LogManager.WriteErrorLog(nameRepository + "Repository : Erreur exécution requête " + errExec.Error())
 			noError = false

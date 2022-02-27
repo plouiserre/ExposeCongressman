@@ -12,12 +12,14 @@ type CongressmanJsonEncoder struct {
 	W http.ResponseWriter
 }
 
-func (cj CongressmanJsonEncoder) EncodeEntities(entityModel models.EntityModel) {
-	json.NewEncoder(cj.W).Encode(entityModel.Congressmans)
+func (cj CongressmanJsonEncoder) EncodeEntities(entities models.IModels) {
+	congressmans := entities.(models.CongressmansModel)
+	json.NewEncoder(cj.W).Encode(congressmans)
 }
 
-func (cj CongressmanJsonEncoder) EncodeEntity(model models.EntityModel) {
-	json.NewEncoder(cj.W).Encode(model.Congressman)
+func (cj CongressmanJsonEncoder) EncodeEntity(entity models.IModel) {
+	congressman := entity.(models.CongressmanModel)
+	json.NewEncoder(cj.W).Encode(congressman)
 }
 
 func (cj CongressmanJsonEncoder) WriteHeader(statusCode int) {
@@ -28,8 +30,7 @@ func (cj CongressmanJsonEncoder) SetHeader() {
 	cj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
 }
 
-func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool) {
-	var entityResult models.EntityModel
+func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.IModel, bool) {
 	var congressman models.CongressmanModel
 
 	noError := true
@@ -41,12 +42,12 @@ func (cj CongressmanJsonEncoder) UnmarshalEntity(body []byte, logManager Manager
 		logManager.WriteErrorLog(errJson.Error())
 		noError = false
 	}
-	entityResult.Congressman = congressman
-	return entityResult, noError
+	return congressman, noError
 }
 
-func (cj CongressmanJsonEncoder) ResponseEntity(model models.EntityModel, lid int64, statusCode int) {
-	model.Congressman.Id = lid
+func (cj CongressmanJsonEncoder) ResponseEntity(entity models.IModel, lid int64, statusCode int) {
+	congressman := entity.(models.CongressmanModel)
+	congressman.Id = lid
 	cj.WriteHeader(statusCode)
-	cj.EncodeEntity(model)
+	cj.EncodeEntity(congressman)
 }

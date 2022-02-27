@@ -29,9 +29,8 @@ func (mm MandateModel) QueryGetById() string {
 	return query
 }
 
-func (mm MandateModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+func (mm MandateModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogManager) (IModel, bool) {
 	var mandate MandateModel
-	var entity EntityModel
 	noError := true
 
 	errScan := row.Scan(&mandate.Id, &mandate.Uid, &mandate.TermOffice, &mandate.TypeOrgane,
@@ -44,12 +43,14 @@ func (mm MandateModel) RowsScanGetById(row *sql.Rows, logManager *manager.LogMan
 		noError = false
 
 	}
-	entity.Mandate = mandate
-	return entity, noError
+
+	return mandate, noError
 }
 
-func (mm MandateModel) IsEntityFill(model EntityModel, logManager *manager.LogManager) bool {
-	if model.Mandate != (MandateModel{}) {
+//TODO to delete ??
+func (mm MandateModel) IsEntityFill(model IModel, logManager *manager.LogManager) bool {
+	mandate := model.(MandateModel)
+	if mandate != (MandateModel{}) {
 		return true
 	} else {
 		logManager.WriteErrorLog("No Data send to insert")
@@ -63,11 +64,9 @@ func (mm MandateModel) QueryCreate() string {
 	return queryMandate
 }
 
-func (mm MandateModel) ExecuteCreateQuery(stmt *sql.Stmt, model EntityModel) (sql.Result, string, error) {
-	mandate := model.Mandate
-	res, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate, mandate.EndDate,
-		mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel, mandate.QualityLabelSex,
-		mandate.RefBody, mandate.CongressmanId)
+func (mm MandateModel) ExecuteCreateQuery(model IModel, stmt *sql.Stmt) (sql.Result, string, error) {
+	res, errExec := stmt.Exec(mm.Uid, mm.TermOffice, mm.TypeOrgane, mm.StartDate, mm.EndDate, mm.Precedence, mm.PrincipleNoming,
+		mm.QualityCode, mm.QualityLabel, mm.QualityLabelSex, mm.RefBody, mm.CongressmanId)
 	return res, "Mandate ", errExec
 }
 
@@ -76,11 +75,9 @@ func (mm MandateModel) QueryUpdate() string {
 	return queryMandate
 }
 
-func (mm MandateModel) ExecuteUpdateQuery(stmt *sql.Stmt, model EntityModel, id int64) (string, error) {
-	mandate := model.Mandate
-	_, errExec := stmt.Exec(mandate.Uid, mandate.TermOffice, mandate.TypeOrgane, mandate.StartDate,
-		mandate.EndDate, mandate.Precedence, mandate.PrincipleNoming, mandate.QualityCode, mandate.QualityLabel,
-		mandate.QualityLabelSex, mandate.RefBody, mandate.CongressmanId, id)
+func (mm MandateModel) ExecuteUpdateQuery(stmt *sql.Stmt, id int64) (string, error) {
+	_, errExec := stmt.Exec(mm.Uid, mm.TermOffice, mm.TypeOrgane, mm.StartDate, mm.EndDate, mm.Precedence, mm.PrincipleNoming, mm.QualityCode,
+		mm.QualityLabel, mm.QualityLabelSex, mm.RefBody, mm.CongressmanId, id)
 	return "Mandate ", errExec
 }
 
@@ -97,9 +94,8 @@ func (mms MandatesModel) GetQuery(db *sql.DB) (*sql.Rows, error) {
 }
 
 //TODO à la fin on ne renverra plus de EntityModel mais un IModels
-func (mms MandatesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (EntityModel, bool) {
+func (mms MandatesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager.LogManager) (IModels, bool) {
 	var mandates MandatesModel
-	var entities EntityModel
 	noError := true
 
 	for rows.Next() {
@@ -116,6 +112,6 @@ func (mms MandatesModel) RowsScanGetEntities(rows *sql.Rows, logManager *manager
 
 		mandates = append(mandates, mandate)
 	}
-	entities.Mandates = mandates
-	return entities, noError
+
+	return mandates, noError
 }
