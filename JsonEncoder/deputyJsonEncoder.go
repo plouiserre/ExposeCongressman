@@ -12,12 +12,14 @@ type DeputyJsonEncoder struct {
 	W http.ResponseWriter
 }
 
-func (dj DeputyJsonEncoder) EncodeEntities(entityModel models.EntityModel) {
-	json.NewEncoder(dj.W).Encode(entityModel.Deputies)
+func (dj DeputyJsonEncoder) EncodeEntities(entities models.IModels) {
+	deputies := entities.(models.DeputiesModel)
+	json.NewEncoder(dj.W).Encode(deputies)
 }
 
-func (dj DeputyJsonEncoder) EncodeEntity(model models.EntityModel) {
-	json.NewEncoder(dj.W).Encode(model.Deputy)
+func (dj DeputyJsonEncoder) EncodeEntity(entity models.IModel) {
+	deputy := entity.(models.DeputyModel)
+	json.NewEncoder(dj.W).Encode(deputy)
 }
 
 func (dj DeputyJsonEncoder) WriteHeader(statusCode int) {
@@ -28,9 +30,8 @@ func (dj DeputyJsonEncoder) SetHeader() {
 	dj.W.Header().Set("Content-type", "application/json;charset=UTF-8")
 }
 
-func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.EntityModel, bool) {
+func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogManager) (models.IModel, bool) {
 	var deputy models.DeputyModel
-	var entityResult models.EntityModel
 
 	noError := true
 
@@ -41,13 +42,12 @@ func (dj DeputyJsonEncoder) UnmarshalEntity(body []byte, logManager Manager.LogM
 		logManager.WriteErrorLog(errJson.Error())
 		noError = false
 	}
-	entityResult.Deputy = deputy
-	return entityResult, noError
+	return deputy, noError
 }
 
-func (dj DeputyJsonEncoder) ResponseEntityCreated(model models.EntityModel, lid int64) {
-	deputy := model.Deputy
+func (dj DeputyJsonEncoder) ResponseEntity(entity models.IModel, lid int64, statusCode int) {
+	deputy := entity.(models.DeputyModel)
 	deputy.Id = lid
-	dj.WriteHeader(http.StatusCreated)
-	dj.EncodeEntity(model)
+	dj.WriteHeader(statusCode)
+	dj.EncodeEntity(deputy)
 }

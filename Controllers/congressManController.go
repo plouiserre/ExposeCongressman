@@ -5,63 +5,63 @@ import (
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
-	repository "github.com/plouiserre/exposecongressman/Repository"
-	services "github.com/plouiserre/exposecongressman/Services"
+	models "github.com/plouiserre/exposecongressman/Models"
 )
 
 func Congressmans(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
-
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
-	GetAll(congressmanJsonEncoder, r, repo)
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, Manager.LogManager{}, models.CongressmanModel{}, models.CongressmansModel{})
+
+	GetAll(modelRequest)
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
-	GetById(congressmanJsonEncoder, r, repo, "congressman", *repo.LogManager)
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
+
+	GetById(modelRequest, "congressman")
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
-	CreateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
+
+	CreateEntity(modelRequest)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
-	UpdateEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
+
+	UpdateEntity(modelRequest)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitCongressmanRepository()
+	logManager := InitLogManager()
 
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
 		W: w,
 	}
 
-	DeleteEntity(congressmanJsonEncoder, r, repo, *repo.LogManager)
-}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
 
-func InitCongressmanRepository() (repository.CongressmanRepository, Manager.LogManager) {
-	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(0)
-	congressmanRepo := repo.(repository.CongressmanRepository)
-	return congressmanRepo, logManager
+	DeleteEntity(modelRequest)
 }

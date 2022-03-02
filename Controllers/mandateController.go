@@ -5,80 +5,62 @@ import (
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
-	repository "github.com/plouiserre/exposecongressman/Repository"
-	services "github.com/plouiserre/exposecongressman/Services"
+	models "github.com/plouiserre/exposecongressman/Models"
 )
 
 func Mandates(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
-
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
 
-	GetAll(MandateJsonEncoder, r, repo)
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, Manager.LogManager{}, models.MandateModel{}, models.MandatesModel{})
+
+	GetAll(modelRequest)
 }
 
 func Mandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
-
+	logManager := InitLogManager()
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
 
-	GetById(MandateJsonEncoder, r, repo, "mandate", *repo.LogManager)
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
+
+	GetById(modelRequest, "mandate")
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	CreateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
+
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
+
+	CreateEntity(modelRequest)
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	UpdateEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
+
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
+
+	UpdateEntity(modelRequest)
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
-	/*repo, logManager := InitMandateRepository()
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-
-	vars := mux.Vars(r)
-
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
-	} else {
-		nbDelete, noError := repo.DeleteMandate(id)
-
-		if !noError {
-			w.WriteHeader(http.StatusInternalServerError)
-		} else if nbDelete > 0 {
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
-	}*/
-	repo, _ := InitMandateRepository()
+	logManager := InitLogManager()
 
 	MandateJsonEncoder := jsonEncoder.MandateJsonEncoder{
 		W: w,
 	}
-	DeleteEntity(MandateJsonEncoder, r, repo, *repo.LogManager)
-}
 
-func InitMandateRepository() (repository.MandateRepository, Manager.LogManager) {
-	entityService := services.EntityService{}
-	repo, logManager := entityService.InitRepository(1)
-	mandateRepo := repo.(repository.MandateRepository)
-	return mandateRepo, logManager
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
+
+	DeleteEntity(modelRequest)
 }
