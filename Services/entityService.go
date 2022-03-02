@@ -16,8 +16,7 @@ const (
 
 type EntityService struct {
 	Entity
-	Models models.IModels
-	//TODO trouver un autre nom
+	Models         models.IModels
 	IModel         models.IModel
 	RepositoryBase repository.RepositoryBase
 }
