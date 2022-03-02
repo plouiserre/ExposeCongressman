@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
+	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -12,9 +13,9 @@ func Mandates(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	mandates := models.MandatesModel{}
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, Manager.LogManager{}, models.MandateModel{}, models.MandatesModel{})
 
-	GetAll(MandateJsonEncoder, r, &mandates)
+	GetAll(modelRequest)
 }
 
 func Mandate(w http.ResponseWriter, r *http.Request) {
@@ -23,9 +24,9 @@ func Mandate(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	mandate := models.MandateModel{}
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
 
-	GetById(MandateJsonEncoder, r, "mandate", logManager, mandate)
+	GetById(modelRequest, "mandate")
 }
 
 func CreateMandate(w http.ResponseWriter, r *http.Request) {
@@ -35,9 +36,9 @@ func CreateMandate(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	mandate := models.MandateModel{}
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
 
-	CreateEntity(MandateJsonEncoder, r, logManager, mandate)
+	CreateEntity(modelRequest)
 }
 
 func UpdateMandate(w http.ResponseWriter, r *http.Request) {
@@ -47,9 +48,9 @@ func UpdateMandate(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	mandate := models.MandateModel{}
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
 
-	UpdateEntity(MandateJsonEncoder, r, logManager, mandate)
+	UpdateEntity(modelRequest)
 }
 
 func DeleteMandate(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +60,7 @@ func DeleteMandate(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	mandate := models.MandateModel{}
+	modelRequest := InitRequestModel(MandateJsonEncoder, r, logManager, models.MandateModel{}, models.MandatesModel{})
 
-	DeleteEntity(MandateJsonEncoder, r, logManager, mandate)
+	DeleteEntity(modelRequest)
 }

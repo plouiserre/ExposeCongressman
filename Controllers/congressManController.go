@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
+	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -12,9 +13,9 @@ func Congressmans(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	congressmans := models.CongressmansModel{}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, Manager.LogManager{}, models.CongressmanModel{}, models.CongressmansModel{})
 
-	GetAll(congressmanJsonEncoder, r, congressmans)
+	GetAll(modelRequest)
 }
 
 func Congressman(w http.ResponseWriter, r *http.Request) {
@@ -24,9 +25,9 @@ func Congressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	congressman := models.CongressmanModel{}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
 
-	GetById(congressmanJsonEncoder, r, "congressman", logManager, congressman)
+	GetById(modelRequest, "congressman")
 }
 
 func CreateCongressman(w http.ResponseWriter, r *http.Request) {
@@ -36,9 +37,9 @@ func CreateCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	congressman := models.CongressmanModel{}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
 
-	CreateEntity(congressmanJsonEncoder, r, logManager, congressman)
+	CreateEntity(modelRequest)
 }
 
 func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
@@ -48,9 +49,9 @@ func UpdateCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	congressman := models.CongressmanModel{}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
 
-	UpdateEntity(congressmanJsonEncoder, r, logManager, congressman)
+	UpdateEntity(modelRequest)
 }
 
 func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +61,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	congressman := models.CongressmanModel{}
+	modelRequest := InitRequestModel(congressmanJsonEncoder, r, logManager, models.CongressmanModel{}, models.CongressmansModel{})
 
-	DeleteEntity(congressmanJsonEncoder, r, logManager, congressman)
+	DeleteEntity(modelRequest)
 }

@@ -10,122 +10,120 @@ import (
 	"github.com/plouiserre/exposecongressman/Manager"
 	model "github.com/plouiserre/exposecongressman/Models"
 	repository "github.com/plouiserre/exposecongressman/Repository"
+	modelRequest "github.com/plouiserre/exposecongressman/Request"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 //TODO mettre moins de paramètre dans ses méthodes
 //TODO créer une struct que j'appelerai basecontroller pour éviter de passer à chaque fois tous ses paramètres
-func GetAll(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, modelsEntities model.IModels) {
-	repositoryBase := InitBaseController(jsonEncoder)
+func GetAll(request modelRequest.ModelRequest) {
+	repositoryBase := InitBaseController(request.JsonEncoder)
 
 	entityService := services.EntityService{
-		Models:         modelsEntities,
+		Models:         request.Models,
 		RepositoryBase: repositoryBase,
 	}
 
 	entities, noError := entityService.GetAll()
 
 	if noError {
-		jsonEncoder.WriteHeader(http.StatusOK)
-		jsonEncoder.EncodeEntities(*entities)
+		request.JsonEncoder.WriteHeader(http.StatusOK)
+		request.JsonEncoder.EncodeEntities(*entities)
 	} else {
-		jsonEncoder.WriteHeader(http.StatusInternalServerError)
+		request.JsonEncoder.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-//retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
-func GetById(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, entityName string, logManager Manager.LogManager, getByIdEntity model.IModel) {
-	repositoryBase := InitBaseController(jsonEncoder)
+func GetById(request modelRequest.ModelRequest, entityName string) {
+	repositoryBase := InitBaseController(request.JsonEncoder)
 
 	entityService := services.EntityService{
-		IModel:         getByIdEntity,
+		IModel:         request.Model,
 		RepositoryBase: repositoryBase,
 	}
 
-	vars := mux.Vars(r)
+	vars := mux.Vars(request.Request)
 	id, err := strconv.Atoi(vars["id"])
 
 	if err != nil {
-		jsonEncoder.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error cast " + err.Error())
+		request.JsonEncoder.WriteHeader(http.StatusBadRequest)
+		request.LogManager.WriteErrorLog("Error cast " + err.Error())
 	} else {
 		entity, noError := entityService.GetById(id)
 		if !noError {
-			jsonEncoder.WriteHeader(http.StatusInternalServerError)
-			logManager.WriteErrorLog("Error during the recovery of the entity")
+			request.JsonEncoder.WriteHeader(http.StatusInternalServerError)
+			request.LogManager.WriteErrorLog("Error during the recovery of the entity")
 		} else if entity != nil {
-			jsonEncoder.WriteHeader(http.StatusOK)
-			jsonEncoder.EncodeEntity(*entity)
+			request.JsonEncoder.WriteHeader(http.StatusOK)
+			request.JsonEncoder.EncodeEntity(*entity)
 		} else {
 			badId := strconv.Itoa(id)
-			jsonEncoder.WriteHeader(http.StatusNotFound)
-			logManager.WriteErrorLog("No " + entityName + " with the Id " + badId)
+			request.JsonEncoder.WriteHeader(http.StatusNotFound)
+			request.LogManager.WriteErrorLog("No " + entityName + " with the Id " + badId)
 		}
 	}
 }
 
-//retravailler les paramètres de cette méthode car le logmanager devrait être le même que dans InitBaseController
-func CreateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, createEntity model.IModel) {
-	repositoryBase := InitBaseController(jsonEncoder)
+func CreateEntity(request modelRequest.ModelRequest) {
+	repositoryBase := InitBaseController(request.JsonEncoder)
 
 	entityService := services.EntityService{
-		IModel:         createEntity,
+		IModel:         request.Model,
 		RepositoryBase: repositoryBase,
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(request.Request.Body)
 
 	if err != nil {
-		jsonEncoder.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
+		request.JsonEncoder.WriteHeader(http.StatusBadRequest)
+		request.LogManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
-		entity, noErrorMarhsal := jsonEncoder.UnmarshalEntity(body, logManager)
+		entity, noErrorMarhsal := request.JsonEncoder.UnmarshalEntity(body, request.LogManager)
 		if !noErrorMarhsal {
-			jsonEncoder.WriteHeader(http.StatusBadRequest)
+			request.JsonEncoder.WriteHeader(http.StatusBadRequest)
 		} else {
 			lid, noErrorCreation := entityService.CreateEntity(&entity)
 			if noErrorCreation {
-				jsonEncoder.ResponseEntity(entity, lid, http.StatusCreated)
+				request.JsonEncoder.ResponseEntity(entity, lid, http.StatusCreated)
 			}
 		}
 	}
 }
 
-//TODO retravailler les paramètres
-func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, updateEntity model.IModel) {
-	repositoryBase := InitBaseController(jsonEncoder)
+func UpdateEntity(request modelRequest.ModelRequest) {
+	repositoryBase := InitBaseController(request.JsonEncoder)
 
 	entityService := services.EntityService{
-		IModel:         updateEntity,
+		IModel:         request.Model,
 		RepositoryBase: repositoryBase,
 	}
 
-	vars := mux.Vars(r)
+	vars := mux.Vars(request.Request)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		jsonEncoder.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
+		request.JsonEncoder.WriteHeader(http.StatusBadRequest)
+		request.LogManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
 		entity, noError := entityService.GetById(id)
 		if !noError {
-			jsonEncoder.WriteHeader(http.StatusInternalServerError)
+			request.JsonEncoder.WriteHeader(http.StatusInternalServerError)
 		} else if entity == nil {
-			jsonEncoder.WriteHeader(http.StatusNotFound)
-			logManager.WriteErrorLog("No congressman find with this id " + vars["id"])
+			request.JsonEncoder.WriteHeader(http.StatusNotFound)
+			request.LogManager.WriteErrorLog("No congressman find with this id " + vars["id"])
 		} else {
-			body, errBody := ioutil.ReadAll(r.Body)
+			body, errBody := ioutil.ReadAll(request.Request.Body)
 			if errBody != nil {
-				jsonEncoder.WriteHeader(http.StatusBadRequest)
-				logManager.WriteErrorLog(err.Error())
+				request.JsonEncoder.WriteHeader(http.StatusBadRequest)
+				request.LogManager.WriteErrorLog(err.Error())
 			} else {
-				entity, noErrorMarhsal := jsonEncoder.UnmarshalEntity(body, logManager)
+				entity, noErrorMarhsal := request.JsonEncoder.UnmarshalEntity(body, request.LogManager)
 				if noErrorMarhsal {
 					updateId := int64(id)
 					updateId, noError := entityService.UpdateEntity(&entity, updateId)
 					if !noError {
-						jsonEncoder.WriteHeader(http.StatusInternalServerError)
+						request.JsonEncoder.WriteHeader(http.StatusInternalServerError)
 					} else {
-						jsonEncoder.ResponseEntity(entity, updateId, http.StatusOK)
+						request.JsonEncoder.ResponseEntity(entity, updateId, http.StatusOK)
 					}
 				}
 			}
@@ -133,29 +131,29 @@ func UpdateEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logMana
 	}
 }
 
-func DeleteEntity(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, deleteEntity model.IModel) {
-	repositoryBase := InitBaseController(jsonEncoder)
+func DeleteEntity(request modelRequest.ModelRequest) {
+	repositoryBase := InitBaseController(request.JsonEncoder)
 
 	entityService := services.EntityService{
-		IModel:         deleteEntity,
+		IModel:         request.Model,
 		RepositoryBase: repositoryBase,
 	}
 
-	vars := mux.Vars(r)
+	vars := mux.Vars(request.Request)
 
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		jsonEncoder.WriteHeader(http.StatusBadRequest)
-		logManager.WriteErrorLog("Error Body " + err.Error())
+		request.JsonEncoder.WriteHeader(http.StatusBadRequest)
+		request.LogManager.WriteErrorLog("Error Body " + err.Error())
 	} else {
 		nbDelete, noError := entityService.DeleteEntity(id)
 
 		if !noError {
-			jsonEncoder.WriteHeader(http.StatusInternalServerError)
+			request.JsonEncoder.WriteHeader(http.StatusInternalServerError)
 		} else if nbDelete > 0 {
-			jsonEncoder.WriteHeader(http.StatusNoContent)
+			request.JsonEncoder.WriteHeader(http.StatusNoContent)
 		} else {
-			jsonEncoder.WriteHeader(http.StatusNotFound)
+			request.JsonEncoder.WriteHeader(http.StatusNotFound)
 		}
 	}
 }
@@ -178,4 +176,15 @@ func InitLogManager() Manager.LogManager {
 	entityService := services.EntityService{}
 	logManager := entityService.InitLogManager()
 	return logManager
+}
+
+func InitRequestModel(jsonEncoder jsonEncoder.IJsonEncoder, r *http.Request, logManager Manager.LogManager, model model.IModel, models model.IModels) modelRequest.ModelRequest {
+	modelRequest := modelRequest.ModelRequest{
+		JsonEncoder: jsonEncoder,
+		Request:     r,
+		LogManager:  logManager,
+		Model:       model,
+		Models:      models,
+	}
+	return modelRequest
 }

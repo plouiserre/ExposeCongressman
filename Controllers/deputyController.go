@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
+	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 )
 
@@ -12,9 +13,9 @@ func Deputies(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	deputies := models.DeputiesModel{}
+	modelRequest := InitRequestModel(deputyJsonEncoder, r, Manager.LogManager{}, models.DeputyModel{}, models.DeputiesModel{})
 
-	GetAll(deputyJsonEncoder, r, deputies)
+	GetAll(modelRequest)
 }
 
 func Deputy(w http.ResponseWriter, r *http.Request) {
@@ -24,9 +25,9 @@ func Deputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	deputy := models.DeputyModel{}
+	modelRequest := InitRequestModel(deputyJsonEncoder, r, logManager, models.DeputyModel{}, models.DeputiesModel{})
 
-	GetById(deputyJsonEncoder, r, "deputy", logManager, deputy)
+	GetById(modelRequest, "deputy")
 }
 
 func CreateDeputy(w http.ResponseWriter, r *http.Request) {
@@ -36,9 +37,9 @@ func CreateDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	deputy := models.DeputyModel{}
+	modelRequest := InitRequestModel(deputyJsonEncoder, r, logManager, models.DeputyModel{}, models.DeputiesModel{})
 
-	CreateEntity(deputyJsonEncoder, r, logManager, deputy)
+	CreateEntity(modelRequest)
 }
 
 func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
@@ -48,9 +49,9 @@ func UpdateDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	deputy := models.DeputyModel{}
+	modelRequest := InitRequestModel(deputyJsonEncoder, r, logManager, models.DeputyModel{}, models.DeputiesModel{})
 
-	UpdateEntity(deputyJsonEncoder, r, logManager, deputy)
+	UpdateEntity(modelRequest)
 }
 
 func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +61,7 @@ func DeleteDeputy(w http.ResponseWriter, r *http.Request) {
 		W: w,
 	}
 
-	deputy := models.DeputyModel{}
+	modelRequest := InitRequestModel(deputyJsonEncoder, r, logManager, models.DeputyModel{}, models.DeputiesModel{})
 
-	DeleteEntity(deputyJsonEncoder, r, logManager, deputy)
+	DeleteEntity(modelRequest)
 }
