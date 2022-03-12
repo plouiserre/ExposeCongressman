@@ -13,6 +13,7 @@ func InitializeRouter() *mux.Router {
 	router.HandleFunc("/congressman/{id}", controllers.Congressman).Methods("GET")
 	router.HandleFunc("/congressman/{id}", controllers.UpdateCongressman).Methods("PUT")
 	router.HandleFunc("/congressman/{id}", controllers.DeleteCongressman).Methods("DELETE")
+	router.HandleFunc("/congressman/{id}/mandates", controllers.CongressmansMandates).Methods("GET")
 
 	router.HandleFunc("/deputies/", controllers.Deputies).Methods("GET")
 	router.HandleFunc("/deputies/", controllers.CreateDeputy).Methods("POST")
