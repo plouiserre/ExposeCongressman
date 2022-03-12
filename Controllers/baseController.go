@@ -14,8 +14,6 @@ import (
 	services "github.com/plouiserre/exposecongressman/Services"
 )
 
-//TODO mettre moins de paramètre dans ses méthodes
-//TODO créer une struct que j'appelerai basecontroller pour éviter de passer à chaque fois tous ses paramètres
 func GetAll(request modelRequest.ModelRequest) {
 	repositoryBase := InitBaseController(request.JsonEncoder)
 
@@ -158,7 +156,6 @@ func DeleteEntity(request modelRequest.ModelRequest) {
 	}
 }
 
-//TODO quand tout sera terminé mettre aussi la partie init EntityService
 func InitBaseController(jsonEncoder jsonEncoder.IJsonEncoder) repository.RepositoryBase {
 	jsonEncoder.SetHeader()
 
