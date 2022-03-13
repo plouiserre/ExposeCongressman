@@ -1,11 +1,13 @@
 package Controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
+	services "github.com/plouiserre/exposecongressman/Services"
 )
 
 func Congressmans(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +69,10 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
+	congressmanService := services.CongressmanService{}
+
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+	response := congressmanService.GetMandatesFromCongressman(5)
+	json.NewEncoder(w).Encode(response)
 }
