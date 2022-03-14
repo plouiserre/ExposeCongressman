@@ -2,13 +2,15 @@ package Service
 
 import (
 	models "github.com/plouiserre/exposecongressman/Models"
+	repository "github.com/plouiserre/exposecongressman/Repository"
 )
 
 type CongressmanService struct {
+	CongressmanRepository repository.CongressmanRepository
 }
 
-func (congressmanService *CongressmanService) GetMandatesFromCongressman(id int) models.CongressmanMandatesModel {
-	mandates := []models.MandateModel{
+func (cs *CongressmanService) GetMandatesFromCongressman(id int64) models.CongressmanMandatesModel {
+	/*mandates := []models.MandateModel{
 
 		models.MandateModel{
 			Id:              113,
@@ -40,6 +42,12 @@ func (congressmanService *CongressmanService) GetMandatesFromCongressman(id int)
 	congressmanMandates := models.CongressmanMandatesModel{
 		CongressmanId: 5,
 		Mandates:      mandates,
+	}
+	return congressmanMandates*/
+	mandates := cs.CongressmanRepository.GetCongressmansMandates(id)
+	congressmanMandates := models.CongressmanMandatesModel{
+		CongressmanId: id,
+		Mandates:      *mandates,
 	}
 	return congressmanMandates
 }
