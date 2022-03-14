@@ -76,3 +76,8 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 	response := congressmanService.GetMandatesFromCongressman(5)
 	json.NewEncoder(w).Encode(response)
 }
+
+func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
