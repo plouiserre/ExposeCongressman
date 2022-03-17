@@ -84,10 +84,6 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//TODO
-//1 - Ajouter la partie récupération ID OK
-//2 - Factorisation OK
-//3 - rajouter la partie log
 func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
 	id, noError := GetParameters(w, r)
 	if noError {
@@ -101,11 +97,13 @@ func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
+	logManager := InitLogManager()
 	vars := mux.Vars(r)
 	var noError bool
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		logManager.WriteErrorLog("Error cast " + err.Error())
 		noError = false
 	} else {
 		noError = true
