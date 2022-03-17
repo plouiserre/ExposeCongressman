@@ -1,6 +1,6 @@
 package Models
 
 type CongressmanMandatesModel struct {
-	CongressmanId int64
+	CongressmanId int
 	Mandates      MandatesModel
 }

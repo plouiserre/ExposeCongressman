@@ -10,7 +10,7 @@ type CongressmanRepository struct {
 	LogManager *manager.LogManager
 }
 
-func (cr CongressmanRepository) GetCongressmansMandates(congressmanId int64) *models.MandatesModel {
+func (cr CongressmanRepository) GetCongressmansMandates(congressmanId int) *models.MandatesModel {
 	var rb RepositoryBase
 	var mandates models.MandatesModel
 

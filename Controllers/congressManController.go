@@ -3,12 +3,16 @@ package Controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	jsonEncoder "github.com/plouiserre/exposecongressman/JsonEncoder"
 	"github.com/plouiserre/exposecongressman/Manager"
 	models "github.com/plouiserre/exposecongressman/Models"
 	services "github.com/plouiserre/exposecongressman/Services"
 )
+
+//TODO mettre les logs
 
 func Congressmans(w http.ResponseWriter, r *http.Request) {
 	congressmanJsonEncoder := jsonEncoder.CongressmanJsonEncoder{
@@ -68,14 +72,20 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 	DeleteEntity(modelRequest)
 }
 
-//TODO retravailler cette méthode pour la partie argument
 func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
-	congressmanService := services.CongressmanService{}
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//		request.LogManager.WriteErrorLog("Error cast " + err.Error())
+	} else {
+		congressmanService := services.CongressmanService{}
 
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	response := congressmanService.GetMandatesFromCongressman(5)
-	json.NewEncoder(w).Encode(response)
+		w.Header().Set("Content-type", "application/json;charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+		response := congressmanService.GetMandatesFromCongressman(id)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 //TODO

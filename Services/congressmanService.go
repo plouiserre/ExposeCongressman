@@ -9,7 +9,7 @@ type CongressmanService struct {
 	CongressmanRepository repository.CongressmanRepository
 }
 
-func (cs *CongressmanService) GetMandatesFromCongressman(id int64) models.CongressmanMandatesModel {
+func (cs *CongressmanService) GetMandatesFromCongressman(id int) models.CongressmanMandatesModel {
 	mandates := cs.CongressmanRepository.GetCongressmansMandates(id)
 	congressmanMandates := models.CongressmanMandatesModel{
 		CongressmanId: id,
