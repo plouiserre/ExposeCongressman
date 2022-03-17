@@ -73,12 +73,8 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		//		request.LogManager.WriteErrorLog("Error cast " + err.Error())
-	} else {
+	id, noError := GetParameters(w, r)
+	if noError {
 		congressmanService := services.CongressmanService{}
 
 		w.Header().Set("Content-type", "application/json;charset=UTF-8")
@@ -90,20 +86,29 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 
 //TODO
 //1 - Ajouter la partie récupération ID OK
-//2 - Factorisation
+//2 - Factorisation OK
 //3 - rajouter la partie log
 func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	departmentId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		//		request.LogManager.WriteErrorLog("Error cast " + err.Error())
-	} else {
+	id, noError := GetParameters(w, r)
+	if noError {
 		congressmanService := services.CongressmanService{}
 
 		w.Header().Set("Content-type", "application/json;charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
-		response := congressmanService.GetCongressmansFromDepartment(departmentId)
+		response := congressmanService.GetCongressmansFromDepartment(id)
 		json.NewEncoder(w).Encode(response)
 	}
+}
+
+func GetParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
+	vars := mux.Vars(r)
+	var noError bool
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		noError = false
+	} else {
+		noError = true
+	}
+	return id, noError
 }
