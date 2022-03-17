@@ -25,3 +25,30 @@ func (cr CongressmanRepository) GetCongressmansMandates(congressmanId int) *mode
 	}
 	return &mandates
 }
+
+func (cr CongressmanRepository) GetCongressmansDepartments(departmentId int) models.CongressmanDepartmentsModel {
+	var rb RepositoryBase
+	var congressmansDepartment models.CongressmanDepartmentsModel
+
+	db := rb.InitDB()
+
+	rows, err := db.Query("select cr.CongressmanId, cr.CongressmanUid, cr.Civility, cr.FirstName, cr.LastName, cr.Alpha, cr.BirthDate, el.Region, el.Department, el.Departmentnum FROM PROCESSDEPUTES.CongressMan cr INNER JOIN PROCESSDEPUTES.Mandate mt ON mt.CongressmanId = cr.CongressmanId INNER JOIN PROCESSDEPUTES.Election el ON mt.MandateId = el.MandateId AND el.DepartmentNum = ?;", departmentId)
+	if err != nil {
+		cr.LogManager.WriteErrorLog("Erreur pour la requête des députés d'un département " + err.Error())
+	} else {
+		for rows.Next() {
+			var congressmanDepartment models.CongressmanDepartmentModel
+			err := rows.Scan(&congressmanDepartment.Id, &congressmanDepartment.Uid, &congressmanDepartment.Civility,
+				&congressmanDepartment.FirstName, &congressmanDepartment.LastName, &congressmanDepartment.Alpha,
+				&congressmanDepartment.BirthDate, &congressmanDepartment.Region, &congressmanDepartment.Department,
+				&congressmanDepartment.Departmentnum)
+
+			if err != nil {
+				cr.LogManager.WriteErrorLog("Erreur récupération du résultat " + err.Error())
+			}
+
+			congressmansDepartment = append(congressmansDepartment, congressmanDepartment)
+		}
+	}
+	return congressmansDepartment
+}

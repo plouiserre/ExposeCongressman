@@ -18,8 +18,8 @@ func (cs *CongressmanService) GetMandatesFromCongressman(id int) models.Congress
 	return congressmanMandates
 }
 
-func (cs *CongressmanService) GetCongressmansFromDepartment(id int64) models.CongressmanDepartmentsModel {
-	congressmanDepartments := models.CongressmanDepartmentsModel{
+func (cs *CongressmanService) GetCongressmansFromDepartment(id int) models.CongressmanDepartmentsModel {
+	/*congressmanDepartments := models.CongressmanDepartmentsModel{
 		{
 			Id:            1,
 			Uid:           "PA1008",
@@ -56,6 +56,7 @@ func (cs *CongressmanService) GetCongressmansFromDepartment(id int64) models.Con
 			Department:    "Gironde",
 			Departmentnum: 33,
 		},
-	}
+	}*/
+	congressmanDepartments := cs.CongressmanRepository.GetCongressmansDepartments(id)
 	return congressmanDepartments
 }
