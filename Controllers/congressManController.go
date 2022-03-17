@@ -68,6 +68,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 	DeleteEntity(modelRequest)
 }
 
+//TODO retravailler cette méthode pour la partie argument
 func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 	congressmanService := services.CongressmanService{}
 
@@ -77,7 +78,16 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+//TODO
+//1 - controller OK
+//2 - service mock + controller branchement
+//3 - repository branchement BDD + service branchement
+
 func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
+	congressmanService := services.CongressmanService{}
+
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+	response := congressmanService.GetCongressmansFromDepartment(33)
+	json.NewEncoder(w).Encode(response)
 }
