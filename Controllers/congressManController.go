@@ -89,15 +89,21 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 }
 
 //TODO
-//1 - controller OK
-//2 - service mock + controller branchement
-//3 - repository branchement BDD + service branchement
-
+//1 - Ajouter la partie récupération ID OK
+//2 - Factorisation
+//3 - rajouter la partie log
 func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
-	congressmanService := services.CongressmanService{}
+	vars := mux.Vars(r)
+	departmentId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//		request.LogManager.WriteErrorLog("Error cast " + err.Error())
+	} else {
+		congressmanService := services.CongressmanService{}
 
-	w.Header().Set("Content-type", "application/json;charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	response := congressmanService.GetCongressmansFromDepartment(33)
-	json.NewEncoder(w).Encode(response)
+		w.Header().Set("Content-type", "application/json;charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+		response := congressmanService.GetCongressmansFromDepartment(departmentId)
+		json.NewEncoder(w).Encode(response)
+	}
 }
