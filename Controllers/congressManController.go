@@ -112,6 +112,10 @@ func GetIdParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
 }
 
 func CongressmansByJobs(w http.ResponseWriter, r *http.Request) {
+	congressmanService := services.CongressmanService{}
+
 	w.Header().Set("Content-type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+	response := congressmanService.GetCongressmansFromJobs("Ingénieur")
+	json.NewEncoder(w).Encode(response)
 }
