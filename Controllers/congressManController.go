@@ -73,7 +73,7 @@ func DeleteCongressman(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
-	id, noError := GetParameters(w, r)
+	id, noError := GetIdParameters(w, r)
 	if noError {
 		congressmanService := services.CongressmanService{}
 
@@ -85,7 +85,7 @@ func CongressmansMandates(w http.ResponseWriter, r *http.Request) {
 }
 
 func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
-	id, noError := GetParameters(w, r)
+	id, noError := GetIdParameters(w, r)
 	if noError {
 		congressmanService := services.CongressmanService{}
 
@@ -96,7 +96,7 @@ func CongressmansByDepartment(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
+func GetIdParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
 	logManager := InitLogManager()
 	vars := mux.Vars(r)
 	var noError bool
@@ -109,4 +109,9 @@ func GetParameters(w http.ResponseWriter, r *http.Request) (int, bool) {
 		noError = true
 	}
 	return id, noError
+}
+
+func CongressmansByJobs(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 }
