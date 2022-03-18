@@ -52,3 +52,19 @@ func (cr CongressmanRepository) GetCongressmansDepartments(departmentId int) mod
 	}
 	return congressmansDepartment
 }
+
+func (cr CongressmanRepository) GetCongressmansJobs(jobs string) *models.CongressmansModel {
+	var rb RepositoryBase
+	var congressmans models.CongressmansModel
+
+	db := rb.InitDB()
+
+	rows, err := db.Query("select * FROM PROCESSDEPUTES.Congressman where JobTitle=?;", jobs)
+	if err != nil {
+		cr.LogManager.WriteErrorLog("Erreur pour la requête des mandats d'un député " + err.Error())
+	} else {
+		result, _ := congressmans.RowsScanGetEntities(rows, cr.LogManager)
+		congressmans = result.(models.CongressmansModel)
+	}
+	return &congressmans
+}
