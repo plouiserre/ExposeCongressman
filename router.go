@@ -9,10 +9,13 @@ func InitializeRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/congressmans/", controllers.Congressmans).Methods("GET")
+	router.HandleFunc("/congressmans/department/{id}", controllers.CongressmansByDepartment).Methods("GET")
+	router.HandleFunc("/congressmans/{jobs}", controllers.CongressmansByJobs).Methods("GET")
 	router.HandleFunc("/congressmans/", controllers.CreateCongressman).Methods("POST")
 	router.HandleFunc("/congressman/{id}", controllers.Congressman).Methods("GET")
 	router.HandleFunc("/congressman/{id}", controllers.UpdateCongressman).Methods("PUT")
 	router.HandleFunc("/congressman/{id}", controllers.DeleteCongressman).Methods("DELETE")
+	router.HandleFunc("/congressman/{id}/mandates", controllers.CongressmansMandates).Methods("GET")
 
 	router.HandleFunc("/deputies/", controllers.Deputies).Methods("GET")
 	router.HandleFunc("/deputies/", controllers.CreateDeputy).Methods("POST")
